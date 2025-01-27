@@ -1,0 +1,105 @@
+#######################################################################################################################
+# ---------------------------------------------------- DEV PROFILE ----------------------------------------------------
+#######################################################################################################################
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3307/business_management_system
+    username: root
+    password: 123
+    driverClassName: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariConnPool
+      leak-detection-threshold: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+
+application:
+  cors-allow-origins: http://localhost:4200
+
+jwt:
+  secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
+---
+#######################################################################################################################
+# ---------------------------------------------------- QA PROFILE ----------------------------------------------------
+#######################################################################################################################
+
+spring:
+  config:
+    activate:
+      on-profile: qa
+  datasource:
+    url: jdbc:mysql://localhost:3307/business_management_system
+    username: root
+    password: 123
+    driverClassName: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariConnPool
+      leak-detection-threshold: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+
+application:
+  cors-allow-origins: http://localhost:4200
+
+jwt:
+  secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
+---
+#######################################################################################################################
+# ---------------------------------------------------- PRODUCTION PROFILE ----------------------------------------------------
+#######################################################################################################################
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://localhost:3307/business_management_system
+    username: root
+    password: 123
+    driverClassName: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariConnPool
+      leak-detection-threshold: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+
+application:
+  cors-allow-origins: http://localhost:4200
+
+jwt:
+  secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
+---
