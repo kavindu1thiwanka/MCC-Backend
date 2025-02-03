@@ -38,16 +38,14 @@ public class UserMst {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "role_id")
+    private Integer roleId;
+
     @Column(name = "contact_number")
     private String contactNumber;
 
     @Column(name = "status")
     private Character status;
-
-    @Transient
-    private Set<String> roleList = new HashSet<>();
-    @Transient
-    private Set<Integer> roleIdList = new HashSet<>();
 
     public UserMst(UserDto user) {
         this.username = user.getUsername();

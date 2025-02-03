@@ -35,8 +35,6 @@ public class AuthServiceImpl implements AuthService {
 
     private UserMstRepository userMstRepository;
     private PrivilegeMstRepository privilegeMstRepository;
-    private UserWiseRolesRepository userWiseRolesRepository;
-    private RoleMstRepository roleMstRepository;
 
     @Override
     public ResponseEntity<Object> authenticateUser(AuthRequestDto authRequest) {
@@ -58,21 +56,7 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
-            user.setRoleIdList(userWiseRolesRepository.getRoleIdListByUserId(user.getId()));
-            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleIdList(user.getRoleIdList());
-            Set<Integer> mainRoleIdList = roleMstRepository.getMainRoleIdList(user.getRoleIdList());
-
-            if (mainRoleIdList.contains(ROLE_ID_ADMIN)) {
-                user.getRoleList().add(ROLE_ADMIN);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_TEACHER)) {
-                user.getRoleList().add(ROLE_TEACHER);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_STUDENT)) {
-                user.getRoleList().add(ROLE_STUDENT);
-            }
+            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
 
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
                     null, grantAuthorityCodes(authCodes)));
@@ -118,13 +102,4 @@ public class AuthServiceImpl implements AuthService {
         this.privilegeMstRepository = privilegeMstRepository;
     }
 
-    @Autowired
-    public void setUserWiseRolesRepository(UserWiseRolesRepository userWiseRolesRepository) {
-        this.userWiseRolesRepository = userWiseRolesRepository;
-    }
-
-    @Autowired
-    public void setRoleMstRepository(RoleMstRepository roleMstRepository) {
-        this.roleMstRepository = roleMstRepository;
-    }
 }

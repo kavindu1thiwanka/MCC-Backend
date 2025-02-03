@@ -14,8 +14,4 @@ public interface PrivilegeMstRepository extends JpaRepository<PrivilegeMst, Inte
     @Query("SELECT priv.privilegeCode FROM PrivilegeMst priv INNER JOIN RolePrivileges rp ON priv.id = rp.privilegeId " +
             "WHERE rp.roleId=:roleId AND priv.status='" + STATUS_ACTIVE + "'")
     Set<String> findPrivilegeIdByRoleId(@Param("roleId") Integer roleId);
-
-    @Query("SELECT priv.privilegeCode FROM PrivilegeMst priv INNER JOIN RolePrivileges rp ON priv.id = rp.privilegeId " +
-            "WHERE rp.roleId IN (:roleIds) AND priv.status='" + STATUS_ACTIVE + "'")
-    Set<String> findPrivilegeIdByRoleIdList(@Param("roleIds") Set<Integer> roleIds);
 }

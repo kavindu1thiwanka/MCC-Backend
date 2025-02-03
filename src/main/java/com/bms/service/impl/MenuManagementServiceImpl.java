@@ -31,13 +31,8 @@ public class MenuManagementServiceImpl implements MenuManagementService {
     public ResponseEntity<Object> getUserMenuList() {
 
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Set<Integer> roleIdList = user.getRoleIdList();
 
-        if (roleIdList == null || roleIdList.isEmpty()) {
-            throw new RuntimeException(ROLE_ID_CANNOT_BE_EMPTY);
-        }
-
-        Set<MenuMst> menuListByRoleId = menuMstRepository.getMenuListByRoleId(roleIdList);
+        Set<MenuMst> menuListByRoleId = menuMstRepository.getMenuListByRoleId(user.getRoleId());
 
         // Preload menus into a Map for quicker lookup
         Map<Integer, MenuMst> menuById = menuListByRoleId.stream()

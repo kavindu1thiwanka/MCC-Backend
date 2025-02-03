@@ -2,9 +2,7 @@ package com.bms.config;
 
 import com.bms.entity.UserMst;
 import com.bms.repository.PrivilegeMstRepository;
-import com.bms.repository.RoleMstRepository;
 import com.bms.repository.UserMstRepository;
-import com.bms.repository.UserWiseRolesRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,17 +20,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.*;
-import static com.bms.util.CommonConstant.ROLE_STUDENT;
-
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtUtil jwtUtil;
     private UserMstRepository userMstRepository;
     private PrivilegeMstRepository privilegeMstRepository;
-    private UserWiseRolesRepository userWiseRolesRepository;
-    private RoleMstRepository roleMstRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -74,21 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UserMst user = userOpt.get();
 
-            user.setRoleIdList(userWiseRolesRepository.getRoleIdListByUserId(user.getId()));
-            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleIdList(user.getRoleIdList());
-            Set<Integer> mainRoleIdList = roleMstRepository.getMainRoleIdList(user.getRoleIdList());
-
-            if (mainRoleIdList.contains(ROLE_ID_ADMIN)) {
-                user.getRoleList().add(ROLE_ADMIN);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_TEACHER)) {
-                user.getRoleList().add(ROLE_TEACHER);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_STUDENT)) {
-                user.getRoleList().add(ROLE_STUDENT);
-            }
+            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
 
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
                     null, grantAuthorityCodes(authCodes)));
@@ -125,13 +104,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.privilegeMstRepository = privilegeMstRepository;
     }
 
-    @Autowired
-    public void setUserWiseRolesRepository(UserWiseRolesRepository userWiseRolesRepository) {
-        this.userWiseRolesRepository = userWiseRolesRepository;
-    }
-
-    @Autowired
-    public void setRoleMstRepository(RoleMstRepository roleMstRepository) {
-        this.roleMstRepository = roleMstRepository;
-    }
 }

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 
-import static com.bms.util.CommonConstant.STATUS_DELETE;
+import static com.bms.util.CommonConstant.*;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
@@ -83,10 +83,24 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         UserMst user = userMstRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND));
 
+        String role = "";
+
+        if (user.getRoleId().equals(ROLE_ID_ADMIN)) {
+            role = ROLE_ADMIN;
+        }
+
+        if (user.getRoleId().equals(ROLE_ID_TEACHER)) {
+            role = ROLE_TEACHER;
+        }
+
+        if (user.getRoleId().equals(ROLE_ID_STUDENT)) {
+            role = ROLE_STUDENT;
+        }
+        
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles("")
+                .roles(role)
                 .build();
     }
 
