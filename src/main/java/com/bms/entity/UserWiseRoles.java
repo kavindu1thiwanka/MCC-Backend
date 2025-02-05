@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Entity
 @NoArgsConstructor
 @Data
 @Table(name = "user_wise_roles")
-public class UserWiseRoles {
+public class UserWiseRoles implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

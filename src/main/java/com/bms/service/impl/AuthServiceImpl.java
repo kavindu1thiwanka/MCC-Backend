@@ -4,9 +4,7 @@ import com.bms.config.JwtUtil;
 import com.bms.dto.AuthRequestDto;
 import com.bms.entity.UserMst;
 import com.bms.repository.PrivilegeMstRepository;
-import com.bms.repository.RoleMstRepository;
 import com.bms.repository.UserMstRepository;
-import com.bms.repository.UserWiseRolesRepository;
 import com.bms.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,14 +17,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.*;
-
 @Service
+@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private AuthenticationManager authenticationManager;

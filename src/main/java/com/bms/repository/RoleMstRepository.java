@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.STATUS_DELETE;
+import static com.bms.util.CommonConstants.STATUS_DELETE;
 
 public interface RoleMstRepository extends JpaRepository<RoleMst, Integer> {
 

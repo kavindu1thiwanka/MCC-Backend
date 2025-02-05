@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-import static com.bms.util.CommonConstant.STATUS_ACTIVE;
+import static com.bms.util.CommonConstants.STATUS_ACTIVE;
 
 public interface UserMstRepository extends JpaRepository<UserMst, Integer> {
 

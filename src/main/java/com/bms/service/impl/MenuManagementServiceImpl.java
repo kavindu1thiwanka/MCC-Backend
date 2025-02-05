@@ -9,15 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bms.util.CommonConstant.MENU_TYPE_MAIN_MENU;
-import static com.bms.util.CommonConstant.MENU_TYPE_SUB_MENU;
-import static com.bms.util.ExceptionMessages.ROLE_ID_CANNOT_BE_EMPTY;
+import static com.bms.util.CommonConstants.MENU_TYPE_MAIN_MENU;
+import static com.bms.util.CommonConstants.MENU_TYPE_SUB_MENU;
 
 @Service
+@Transactional
 public class MenuManagementServiceImpl implements MenuManagementService {
 
     private MenuMstRepository menuMstRepository;

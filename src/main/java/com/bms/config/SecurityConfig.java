@@ -19,7 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-import static com.bms.util.CommonConstant.YML_CORS_ALLOW_ORIGINS;
+import static com.bms.util.CommonConstants.YML_CORS_ALLOW_ORIGINS;
 
 @Configuration
 public class SecurityConfig {

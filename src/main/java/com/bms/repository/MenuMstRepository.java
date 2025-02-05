@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.STATUS_ACTIVE;
+import static com.bms.util.CommonConstants.STATUS_ACTIVE;
 
 public interface MenuMstRepository extends JpaRepository<MenuMst, Integer> {
 

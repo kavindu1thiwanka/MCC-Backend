@@ -1,7 +1,6 @@
 package com.bms.service.impl;
 
 import com.bms.dto.RoleManagementDto;
-import com.bms.entity.PrivilegeMst;
 import com.bms.entity.RoleMst;
 import com.bms.entity.RolePrivileges;
 import com.bms.entity.UserMst;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.*;
+import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.ROLE_ID_CANNOT_BE_EMPTY;
 
 @Service
@@ -244,13 +243,12 @@ public class RoleManagementServiceImpl implements RoleManagementService {
     public ResponseEntity<Object> getLoggedInUserPrivilegeList() {
 
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Set<Integer> roleIdList = user.getRoleIdList();
 
-        if (roleIdList == null || roleIdList.isEmpty()) {
+        if (user.getRoleId() == null) {
             throw new RuntimeException(ROLE_ID_CANNOT_BE_EMPTY);
         }
 
-        return new ResponseEntity<>(privilegeMstRepository.findPrivilegeIdByRoleIdList(roleIdList), HttpStatus.OK);
+        return new ResponseEntity<>(privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId()), HttpStatus.OK);
     }
 
     @Autowired

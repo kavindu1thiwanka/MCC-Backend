@@ -13,13 +13,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-
-import static com.bms.util.CommonConstant.*;
+import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
+@Transactional
 public class UserManagementServiceImpl implements UserManagementService, UserDetailsService {
 
     private UserMstRepository userMstRepository;
@@ -76,6 +76,14 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             throw new IllegalArgumentException(USER_PASSWORD_CANNOT_BE_EMPTY);
         }
+
+        if (user.getRoleId() == null) {
+            throw new IllegalArgumentException(ROLE_ID_CANNOT_BE_EMPTY);
+        }
+
+        if (user.getRoleId().equals(ROLE_ID_DRIVER) && (user.getDriverLicenseNo() == null || user.getDriverLicenseNo().isEmpty())) {
+            throw new IllegalArgumentException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
+        }
     }
 
     @Override
@@ -89,14 +97,14 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
             role = ROLE_ADMIN;
         }
 
-        if (user.getRoleId().equals(ROLE_ID_TEACHER)) {
-            role = ROLE_TEACHER;
+        if (user.getRoleId().equals(ROLE_ID_CUSTOMER)) {
+            role = ROLE_CUSTOMER;
         }
 
-        if (user.getRoleId().equals(ROLE_ID_STUDENT)) {
-            role = ROLE_STUDENT;
+        if (user.getRoleId().equals(ROLE_ID_DRIVER)) {
+            role = ROLE_DRIVER;
         }
-        
+
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())

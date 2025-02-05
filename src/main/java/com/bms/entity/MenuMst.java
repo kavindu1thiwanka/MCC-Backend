@@ -1,9 +1,12 @@
 package com.bms.entity;
 
+import com.bms.entity.abst.CommonBaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,11 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Table(name = "menu_mst")
-public class MenuMst {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+@EqualsAndHashCode(callSuper = true)
+public class MenuMst extends CommonBaseEntity implements Serializable {
 
     @Column(name = "name")
     private String name;
