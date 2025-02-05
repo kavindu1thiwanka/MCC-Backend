@@ -55,4 +55,12 @@ public class UserMst extends CommonBaseEntity implements Serializable {
         this.driverLicenseNo = user.getDriverLicenseNo();
         this.status = STATUS_ACTIVE;
     }
+
+    public void updateUserDetails(UserDto userDetails) {
+        this.firstName = userDetails.getFirstName();
+        this.lastName = userDetails.getLastName();
+        this.email = userDetails.getEmail();
+        this.contactNumber = userDetails.getContactNumber();
+        this.driverLicenseNo = userDetails.getDriverLicenseNo();
+    }
 }

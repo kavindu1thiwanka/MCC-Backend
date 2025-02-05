@@ -7,6 +7,7 @@ import com.bms.service.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +15,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
@@ -41,6 +47,125 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         userMstRepository.save(userMst);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
+     * This method is used to update user details
+     *
+     * @param userDetails user details
+     * @return HttpStatus 200
+     */
+    @Override
+    public ResponseEntity<Object> updateUser(UserDto userDetails) {
+
+        if (userDetails.getId() == null) {
+            throw new IllegalArgumentException(USER_ID_CANNOT_BE_EMPTY);
+        }
+
+        UserMst existingUser = getExistingUser(userDetails.getId());
+        existingUser.updateUserDetails(userDetails);
+        existingUser.setPassword(userDetails.getPassword() == null
+                ? existingUser.getPassword() : passwordEncoder.encode(userDetails.getPassword()));
+        setUsersUpdatedMetaData(existingUser);
+
+        userMstRepository.save(existingUser);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    /**
+     * This method is used to activate user
+     *
+     * @param userId user id
+     * @return HttpStatus 200
+     */
+    @Override
+    public ResponseEntity<Object> activateUser(Integer userId) {
+
+        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_ACTIVE);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to inactivate user
+     *
+     * @param userId user id
+     * @return HttpStatus 200
+     */
+    @Override
+    public ResponseEntity<Object> inactivateUser(Integer userId) {
+
+        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_INACTIVE);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to delete user
+     *
+     * @param userId user id
+     * @return HttpStatus 200
+     */
+    @Override
+    public ResponseEntity<Object> deleteUser(Integer userId) {
+
+        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_DELETE);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to change user's status
+     */
+    private void changeUserStatus(List<Integer> userIdList, Character status) {
+
+        if (userIdList == null || userIdList.isEmpty()) {
+            throw new IllegalArgumentException(USER_IDS_CANNOT_BE_EMPTY);
+        }
+
+        List<UserMst> updatedUserList = new ArrayList<>();
+
+        for (Integer userId : userIdList) {
+            UserMst existingUser = getExistingUser(userId);
+            existingUser.setStatus(status);
+            setUsersUpdatedMetaData(existingUser);
+            updatedUserList.add(existingUser);
+        }
+
+        userMstRepository.saveAll(updatedUserList);
+    }
+
+    /**
+     * This method is used to retrieve user details related to provided user id
+     *
+     * @param userId user id
+     * @return HttpStatus 200 with user details
+     */
+    @Override
+    public ResponseEntity<Object> getUserDetails(Integer userId) {
+        return new ResponseEntity<>(getExistingUser(userId), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve user details related to provided user id
+     */
+    private UserMst getExistingUser(Integer userId) {
+
+        Optional<UserMst> existingUserOpt = userMstRepository.findById(userId);
+
+        if (existingUserOpt.isEmpty()) {
+            throw new RuntimeException(USER_NOT_FOUND);
+        }
+
+        return existingUserOpt.get();
+    }
+
+    /**
+     * This method is used to set the updated metadata like updatedBy and updatedOn
+     */
+    private void setUsersUpdatedMetaData(UserMst existingUser) {
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        existingUser.setUpdateBy(user.getEmail());
+        existingUser.setUpdateOn(new Date());
     }
 
     /**

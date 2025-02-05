@@ -4,6 +4,8 @@ public abstract class ExceptionMessages {
 
     // User Related Exceptions
     public static final String USERNAME_CANNOT_BE_EMPTY = "Username cannot be empty";
+    public static final String USER_ID_CANNOT_BE_EMPTY = "User id cannot be empty";
+    public static final String USER_IDS_CANNOT_BE_EMPTY = "User id(s) cannot be empty";
     public static final String FIRST_NAME_CANNOT_BE_EMPTY = "First name cannot be empty";
     public static final String LAST_NAME_CANNOT_BE_EMPTY = "Last name cannot be empty";
     public static final String USER_EMAIL_CANNOT_BE_EMPTY = "Email cannot be empty";
