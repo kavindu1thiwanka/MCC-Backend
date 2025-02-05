@@ -4,6 +4,7 @@ import com.bms.dto.UserDto;
 import com.bms.entity.UserMst;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.UserManagementService;
+import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return ResponseEntity
      */
     @Override
-    public ResponseEntity<Object> createUser(UserDto user) {
+    public ResponseEntity<Object> createUser(UserDto user) throws BMSCheckedException {
 
         validateUserCreate(user);
 
@@ -56,10 +57,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
-    public ResponseEntity<Object> updateUser(UserDto userDetails) {
+    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException {
 
         if (userDetails.getId() == null) {
-            throw new IllegalArgumentException(USER_ID_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
         }
 
         UserMst existingUser = getExistingUser(userDetails.getId());
@@ -81,7 +82,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
-    public ResponseEntity<Object> activateUser(Integer userId) {
+    public ResponseEntity<Object> activateUser(Integer userId) throws BMSCheckedException {
 
         changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_ACTIVE);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -94,9 +95,9 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
-    public ResponseEntity<Object> inactivateUser(Integer userId) {
+    public ResponseEntity<Object> inactivateUser(Integer userId) throws BMSCheckedException {
 
-        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_INACTIVE);
+        changeUserStatus(new ArrayList<>(userId), STATUS_INACTIVE);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -107,7 +108,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
-    public ResponseEntity<Object> deleteUser(Integer userId) {
+    public ResponseEntity<Object> deleteUser(Integer userId) throws BMSCheckedException {
 
         changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_DELETE);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -116,10 +117,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     /**
      * This method is used to change user's status
      */
-    private void changeUserStatus(List<Integer> userIdList, Character status) {
+    private void changeUserStatus(List<Integer> userIdList, Character status) throws BMSCheckedException {
 
         if (userIdList == null || userIdList.isEmpty()) {
-            throw new IllegalArgumentException(USER_IDS_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(USER_IDS_CANNOT_BE_EMPTY);
         }
 
         List<UserMst> updatedUserList = new ArrayList<>();
@@ -173,41 +174,41 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      *
      * @param user user details
      */
-    private void validateUserCreate(UserDto user) {
+    private void validateUserCreate(UserDto user) throws BMSCheckedException {
         if (user.getUsername() == null || user.getUsername().isEmpty()) {
-            throw new IllegalArgumentException(USERNAME_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(USERNAME_CANNOT_BE_EMPTY);
         } else {
             userMstRepository.findByUsernameAndStatusNot(user.getUsername(), STATUS_DELETE).ifPresent(userMst -> {
-                throw new IllegalArgumentException(USERNAME_ALREADY_EXISTS);
+                throw new RuntimeException(USERNAME_ALREADY_EXISTS);
             });
         }
 
         if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-            throw new IllegalArgumentException(FIRST_NAME_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(FIRST_NAME_CANNOT_BE_EMPTY);
         }
 
         if (user.getLastName() == null || user.getLastName().isEmpty()) {
-            throw new IllegalArgumentException(LAST_NAME_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(LAST_NAME_CANNOT_BE_EMPTY);
         }
 
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException(USER_EMAIL_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(USER_EMAIL_CANNOT_BE_EMPTY);
         }
 
         if (user.getContactNumber() == null || user.getContactNumber().isEmpty()) {
-            throw new IllegalArgumentException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
         }
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            throw new IllegalArgumentException(USER_PASSWORD_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(USER_PASSWORD_CANNOT_BE_EMPTY);
         }
 
         if (user.getRoleId() == null) {
-            throw new IllegalArgumentException(ROLE_ID_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(ROLE_ID_CANNOT_BE_EMPTY);
         }
 
         if (user.getRoleId().equals(ROLE_ID_DRIVER) && (user.getDriverLicenseNo() == null || user.getDriverLicenseNo().isEmpty())) {
-            throw new IllegalArgumentException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
         }
     }
 

@@ -14,9 +14,12 @@ public abstract class ExceptionMessages {
     public static final String USER_NOT_FOUND = "User not found";
     public static final String USERNAME_ALREADY_EXISTS = "Username already exists";
     public static final String DRIVER_LICENSE_NO_CANNOT_BE_EMPTY = "Driver license no cannot be empty";
+    public static final String INVALID_PASSWORD = "Invalid password";
 
     // Role Related Exceptions
     public static final String ROLE_ID_CANNOT_BE_EMPTY = "Role id cannot be empty";
+    public static final String ROLE_IDS_CANNOT_BE_EMPTY = "Role id(s) cannot be empty";
+    public static final String ROLE_NOT_FOUND = "Role not found";
 
     // Reservation Related Exceptions
     public static final String VEHICLE_NO_CANNOT_BE_EMPTY = "Vehicle no cannot be empty";

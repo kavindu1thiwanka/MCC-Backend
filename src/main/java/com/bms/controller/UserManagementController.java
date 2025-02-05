@@ -2,6 +2,7 @@ package com.bms.controller;
 
 import com.bms.dto.UserDto;
 import com.bms.service.UserManagementService;
+import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,27 +16,27 @@ public class UserManagementController {
     private UserManagementService userManagementService;
 
     @PostMapping(CREATE_USER_V1)
-    public ResponseEntity<Object> createUser(@RequestBody UserDto user) {
+    public ResponseEntity<Object> createUser(@RequestBody UserDto user) throws BMSCheckedException {
         return userManagementService.createUser(user);
     }
 
     @PutMapping(UPDATE_USER_V1)
-    public ResponseEntity<Object> updateUser(@RequestBody UserDto user) {
+    public ResponseEntity<Object> updateUser(@RequestBody UserDto user) throws BMSCheckedException {
         return userManagementService.updateUser(user);
     }
 
     @PutMapping(ACTIVATE_USER_V1)
-    public ResponseEntity<Object> activateUser(@RequestParam Integer userId) {
+    public ResponseEntity<Object> activateUser(@RequestParam Integer userId) throws BMSCheckedException {
         return userManagementService.activateUser(userId);
     }
 
     @PutMapping(INACTIVATE_USER_V1)
-    public ResponseEntity<Object> inactivateUser(@RequestParam Integer userId) {
+    public ResponseEntity<Object> inactivateUser(@RequestParam Integer userId) throws BMSCheckedException {
         return userManagementService.inactivateUser(userId);
     }
 
     @DeleteMapping(DELETE_USER_V1)
-    public ResponseEntity<Object> deleteUser(@RequestParam Integer userId) {
+    public ResponseEntity<Object> deleteUser(@RequestParam Integer userId) throws BMSCheckedException {
         return userManagementService.deleteUser(userId);
     }
 

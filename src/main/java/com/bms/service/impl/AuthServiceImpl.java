@@ -6,6 +6,7 @@ import com.bms.entity.UserMst;
 import com.bms.repository.PrivilegeMstRepository;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.AuthService;
+import com.bms.util.ExceptionMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,13 +42,13 @@ public class AuthServiceImpl implements AuthService {
 
             Optional<UserMst> userOptional = userMstRepository.findByUsername(authRequest.getUsername());
             if (userOptional.isEmpty()) {
-                return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(ExceptionMessages.USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
             }
 
             UserMst user = userOptional.get();
 
             if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-                return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(ExceptionMessages.INVALID_PASSWORD, HttpStatus.UNAUTHORIZED);
             }
 
             authentication = authenticationManager.authenticate(

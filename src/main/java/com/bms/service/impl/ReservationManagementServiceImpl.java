@@ -5,6 +5,7 @@ import com.bms.entity.ReservationMst;
 import com.bms.entity.UserMst;
 import com.bms.repository.ReservationMstRepository;
 import com.bms.service.ReservationManagementService;
+import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * @return 201 HttpStatus if successfully created
      */
     @Override
-    public ResponseEntity<Object> createReservation(ReservationDto reservationDto) {
+    public ResponseEntity<Object> createReservation(ReservationDto reservationDto) throws BMSCheckedException {
 
         validateTransaction(reservationDto);
 
@@ -49,25 +50,25 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      *
      * @param reservationDto reservation details
      */
-    private void validateTransaction(ReservationDto reservationDto) {
+    private void validateTransaction(ReservationDto reservationDto) throws BMSCheckedException {
         if (reservationDto.getVehicleNo() == null || reservationDto.getVehicleNo().isEmpty()) {
-            throw new IllegalArgumentException(VEHICLE_NO_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(VEHICLE_NO_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getNeedDriver() && reservationDto.getDriverId() == null) {
-            throw new IllegalArgumentException(DRIVER_ID_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(DRIVER_ID_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getPickUpDate() == null) {
-            throw new IllegalArgumentException(PICK_UP_DATE_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(PICK_UP_DATE_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getReturnDate() == null) {
-            throw new IllegalArgumentException(RETURN_DATE_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(RETURN_DATE_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getPickUpLocation() == null || reservationDto.getPickUpLocation().isEmpty()) {
-            throw new IllegalArgumentException(PICK_UP_LOCATION_CANNOT_BE_EMPTY);
+            throw new BMSCheckedException(PICK_UP_LOCATION_CANNOT_BE_EMPTY);
         }
     }
 

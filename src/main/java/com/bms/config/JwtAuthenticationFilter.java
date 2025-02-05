@@ -51,17 +51,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtUtil.extractUsername(jwt);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or expired token");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
             return;
         }
 
         if (username != null && jwtUtil.validateToken(jwt, username)) {
 
             Optional<UserMst> userOpt = userMstRepository.findByUsername(username);
+
             if (userOpt.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("User not found");
+                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "User not found");
                 return;
             }
 
@@ -73,20 +72,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     null, grantAuthorityCodes(authCodes)));
 
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token is invalid or expired");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
             return;
         }
 
-        chain.doFilter(request, response);
+        try {
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            if (response.getStatus() == HttpServletResponse.SC_OK) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+            sendErrorResponse(response, response.getStatus(), e.getCause().getMessage());
+        }
     }
 
-    public Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
+    /**
+     * This method is used to generate a list of GrantedAuthority objects from
+     * the auth codes that the user has.
+     */
+    private Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
         Set<GrantedAuthority> authorityList = new HashSet<>();
         authCodes.forEach((authority) -> {
             authorityList.add(new SimpleGrantedAuthority(authority));
         });
         return authorityList;
+    }
+
+    /**
+     * Helper method to send JSON error responses with correct status codes.
+     */
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message + "\"}");
     }
 
     @Autowired
