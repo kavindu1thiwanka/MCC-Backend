@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.Date;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.List;
 import static com.bms.util.CommonConstants.*;
 
 @Service
-@RequestScope
 public class EmailServiceImpl implements EmailService {
 
     private JavaMailSender mailSender;
@@ -42,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
                 helper.setFrom(fromMail);
-                helper.setTo(emailMst.getTo());
+                helper.setTo(emailMst.getSendTo());
                 helper.setSubject(emailMst.getSubject());
                 helper.setText(emailMst.getSubject(), true);
                 mailSender.send(message);
