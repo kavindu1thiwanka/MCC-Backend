@@ -19,4 +19,5 @@ public class UserDto {
     private String contactNumber;
     private String driverLicenseNo;
     private Character status;
+    private String identifier;
 }

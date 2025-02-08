@@ -13,8 +13,11 @@ public abstract class ExceptionMessages {
     public static final String USER_PASSWORD_CANNOT_BE_EMPTY = "Password cannot be empty";
     public static final String USER_NOT_FOUND = "User not found";
     public static final String USERNAME_ALREADY_EXISTS = "Username already exists";
+    public static final String USER_ALREADY_EXISTS = "There is an existing user with the provided email address";
     public static final String DRIVER_LICENSE_NO_CANNOT_BE_EMPTY = "Driver license no cannot be empty";
     public static final String INVALID_PASSWORD = "Invalid password";
+    public static final String IDENTIFIER_NOT_FOUND = "Identifier not found";
+    public static final String INVALID_IDENTIFIER = "Invalid identifier";
 
     // Role Related Exceptions
     public static final String ROLE_ID_CANNOT_BE_EMPTY = "Role id cannot be empty";

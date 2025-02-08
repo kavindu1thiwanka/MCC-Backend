@@ -33,17 +33,22 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
-     * This method is used to create user
+     * This method is used to register users (Customers & Drivers)
      *
      * @param user user details
      * @return ResponseEntity
      */
     @Override
-    public ResponseEntity<Object> createUser(UserDto user) throws BMSCheckedException {
+    public ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException {
 
         validateUserCreate(user);
 
         UserMst userMst = new UserMst(user);
+
+        if (userMst.getRoleId().equals(ROLE_ID_DRIVER) && (userMst.getDriverLicenseNo() == null || userMst.getDriverLicenseNo().isEmpty())) {
+            throw new BMSCheckedException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
+        }
+
         userMst.setPassword(passwordEncoder.encode(user.getPassword()));
         userMstRepository.save(userMst);
 
@@ -175,11 +180,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @param user user details
      */
     private void validateUserCreate(UserDto user) throws BMSCheckedException {
-        if (user.getUsername() == null || user.getUsername().isEmpty()) {
-            throw new BMSCheckedException(USERNAME_CANNOT_BE_EMPTY);
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new BMSCheckedException(USER_EMAIL_CANNOT_BE_EMPTY);
         } else {
-            userMstRepository.findByUsernameAndStatusNot(user.getUsername(), STATUS_DELETE).ifPresent(userMst -> {
-                throw new RuntimeException(USERNAME_ALREADY_EXISTS);
+            userMstRepository.findByEmailAndStatusNot(user.getEmail(), STATUS_DELETE).ifPresent(userMst -> {
+                throw new RuntimeException(USER_ALREADY_EXISTS);
             });
         }
 
@@ -191,10 +197,6 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
             throw new BMSCheckedException(LAST_NAME_CANNOT_BE_EMPTY);
         }
 
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new BMSCheckedException(USER_EMAIL_CANNOT_BE_EMPTY);
-        }
-
         if (user.getContactNumber() == null || user.getContactNumber().isEmpty()) {
             throw new BMSCheckedException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
         }
@@ -203,12 +205,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
             throw new BMSCheckedException(USER_PASSWORD_CANNOT_BE_EMPTY);
         }
 
-        if (user.getRoleId() == null) {
-            throw new BMSCheckedException(ROLE_ID_CANNOT_BE_EMPTY);
-        }
-
-        if (user.getRoleId().equals(ROLE_ID_DRIVER) && (user.getDriverLicenseNo() == null || user.getDriverLicenseNo().isEmpty())) {
-            throw new BMSCheckedException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
+        if (user.getIdentifier() == null) {
+            throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
+        } else if (!List.of(CHARACTER_ROLE_CUSTOMER, CHARACTER_ROLE_DRIVER).contains(user.getIdentifier())) {
+            throw new BMSCheckedException(INVALID_IDENTIFIER);
         }
     }
 

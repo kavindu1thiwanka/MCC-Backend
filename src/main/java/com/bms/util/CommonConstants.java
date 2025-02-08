@@ -22,6 +22,9 @@ public abstract class CommonConstants {
     public static final String ROLE_CUSTOMER = "RL_CUSTOMER";
     public static final String ROLE_DRIVER = "RL_DRIVER";
 
+    public static final String CHARACTER_ROLE_CUSTOMER = "BMSCR8754";
+    public static final String CHARACTER_ROLE_DRIVER = "BMSCR4432";
+
     // YML Properties
     public static final String JWT_SECRET = "${jwt.secret}";
     public static final String YML_CORS_ALLOW_ORIGINS = "${application.cors-allow-origins}";

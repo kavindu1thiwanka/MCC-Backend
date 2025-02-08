@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface UserManagementService {
 
-    ResponseEntity<Object> createUser(UserDto user) throws BMSCheckedException;
+    ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException;
 
     ResponseEntity<Object> updateUser(UserDto user) throws BMSCheckedException;
 

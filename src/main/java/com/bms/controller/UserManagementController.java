@@ -15,9 +15,9 @@ public class UserManagementController {
 
     private UserManagementService userManagementService;
 
-    @PostMapping(CREATE_USER_V1)
-    public ResponseEntity<Object> createUser(@RequestBody UserDto user) throws BMSCheckedException {
-        return userManagementService.createUser(user);
+    @PostMapping(REGISTER_USER_V1)
+    public ResponseEntity<Object> registerUser(@RequestBody UserDto user) throws BMSCheckedException {
+        return userManagementService.registerUser(user);
     }
 
     @PutMapping(UPDATE_USER_V1)
