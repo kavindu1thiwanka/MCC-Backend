@@ -6,6 +6,16 @@ spring:
   config:
     activate:
       on-profile: dev
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kavidu12thiwanka@gmail.com
+    password: test.Kavi1du#.12552
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+    from: bms@info.com
+    retry-count: 3
   datasource:
     url: jdbc:mysql://localhost:3307/business_management_system
     username: root
@@ -28,7 +38,7 @@ spring:
       hibernate.format_sql: true
 
 application:
-  cors-allow-origins: http://localhost:4200
+  cors-allow-origins: http://localhost:4201
 
 jwt:
   secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
@@ -41,6 +51,16 @@ spring:
   config:
     activate:
       on-profile: qa
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kavidu12thiwanka@gmail.com
+    password: test.Kavi1du#.12552
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+    from: bms@info.com
+    retry-count: 3
   datasource:
     url: jdbc:mysql://localhost:3307/business_management_system
     username: root
@@ -63,7 +83,7 @@ spring:
       hibernate.format_sql: true
 
 application:
-  cors-allow-origins: http://localhost:4200
+  cors-allow-origins: http://localhost:4201
 
 jwt:
   secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
@@ -76,6 +96,16 @@ spring:
   config:
     activate:
       on-profile: prod
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kavidu12thiwanka@gmail.com
+    password: test.Kavi1du#.12552
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+    from: bms@info.com
+    retry-count: 3
   datasource:
     url: jdbc:mysql://localhost:3307/business_management_system
     username: root
@@ -98,7 +128,7 @@ spring:
       hibernate.format_sql: true
 
 application:
-  cors-allow-origins: http://localhost:4200
+  cors-allow-origins: http://localhost:4201
 
 jwt:
   secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
