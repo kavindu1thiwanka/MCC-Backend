@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<Object> authenticateUser(AuthRequestDto authRequest) {
         Authentication authentication;
+        UserMst user;
         try {
 
             Optional<UserMst> userOptional = userMstRepository.findByUsername(authRequest.getUsername());
@@ -45,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
                 return new ResponseEntity<>(ExceptionMessages.USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
             }
 
-            UserMst user = userOptional.get();
+            user = userOptional.get();
 
             if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
                 return new ResponseEntity<>(ExceptionMessages.INVALID_PASSWORD, HttpStatus.UNAUTHORIZED);
@@ -64,8 +65,7 @@ public class AuthServiceImpl implements AuthService {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        // Generate JWT if authentication is successful
-        return new ResponseEntity<>(new AuthRequestDto(jwtUtil.generateToken(authentication.getName())), HttpStatus.OK);
+        return new ResponseEntity<>(new AuthRequestDto(jwtUtil.generateToken(authentication.getName()), user), HttpStatus.OK);
     }
 
     public Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {

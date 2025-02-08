@@ -1,15 +1,34 @@
 package com.bms.dto;
 
+import com.bms.entity.UserMst;
+
+import static com.bms.util.CommonConstants.*;
+
 public class AuthRequestDto {
     private String username;
     private String password;
     private String token;
+    private String identifier;
+    private String firstName;
+    private String lastName;
 
     public AuthRequestDto() {
     }
 
-    public AuthRequestDto(String token) {
+    public AuthRequestDto(String token, UserMst user) {
         this.token = token;
+        this.username = null;
+        this.password = null;
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+
+        if (user.getRoleId().equals(ROLE_ID_ADMIN)) {
+            this.identifier = IDENTIFIER_ROLE_ADMIN;
+        } else if (user.getRoleId().equals(ROLE_ID_CUSTOMER)) {
+            this.identifier = IDENTIFIER_ROLE_CUSTOMER;
+        } else if (user.getRoleId().equals(ROLE_ID_DRIVER)) {
+            this.identifier = IDENTIFIER_ROLE_DRIVER;
+        }
     }
 
     public AuthRequestDto(String username, String password) {

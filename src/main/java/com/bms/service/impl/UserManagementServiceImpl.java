@@ -207,7 +207,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         if (user.getIdentifier() == null) {
             throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
-        } else if (!List.of(CHARACTER_ROLE_CUSTOMER, CHARACTER_ROLE_DRIVER).contains(user.getIdentifier())) {
+        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER).contains(user.getIdentifier())) {
             throw new BMSCheckedException(INVALID_IDENTIFIER);
         }
     }

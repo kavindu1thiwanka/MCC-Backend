@@ -55,10 +55,10 @@ public class UserMst extends CommonBaseEntity implements Serializable {
         this.status = STATUS_ACTIVE;
 
         switch (user.getIdentifier()) {
-            case CHARACTER_ROLE_CUSTOMER:
+            case IDENTIFIER_ROLE_CUSTOMER:
                 this.roleId = ROLE_ID_CUSTOMER;
                 break;
-            case CHARACTER_ROLE_DRIVER:
+            case IDENTIFIER_ROLE_DRIVER:
                 this.roleId = ROLE_ID_DRIVER;
                 break;
         }
