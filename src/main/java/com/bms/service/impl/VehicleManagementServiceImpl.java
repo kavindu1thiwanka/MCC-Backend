@@ -1,6 +1,7 @@
 package com.bms.service.impl;
 
 import com.bms.dto.CommonFilterDto;
+import com.bms.dto.VehicleMstDto;
 import com.bms.repository.VehicleManagementCustomRepository;
 import com.bms.service.VehicleManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Override
     public ResponseEntity<Object> getVehicleList(CommonFilterDto commonFilterDto) {
         return new ResponseEntity<>(vehicleManagementCustomRepository.getVehicleList(commonFilterDto), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto) {
+        return null;
     }
 
     @Autowired

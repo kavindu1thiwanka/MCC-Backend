@@ -1,6 +1,7 @@
 package com.bms.controller;
 
 import com.bms.dto.CommonFilterDto;
+import com.bms.dto.VehicleMstDto;
 import com.bms.service.VehicleManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,11 @@ public class VehicleManagementController {
     @PostMapping(GET_VEHICLE_LIST_V1)
     public ResponseEntity<Object> getVehicleList(@RequestBody CommonFilterDto commonFilterDto) {
         return vehicleManagementService.getVehicleList(commonFilterDto);
+    }
+
+    @PostMapping
+    public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto) {
+        return vehicleManagementService.addVehicle(vehicleMstDto);
     }
 
     @Autowired
