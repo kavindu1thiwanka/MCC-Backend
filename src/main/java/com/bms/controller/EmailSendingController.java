@@ -15,7 +15,7 @@ public class EmailSendingController {
     /**
      * This method is used to send emails
      */
-    @Scheduled(fixedDelay = 60000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 30000, initialDelay = 1000)
     private void sendEmails() {
         emailService.sendEmails();
     }

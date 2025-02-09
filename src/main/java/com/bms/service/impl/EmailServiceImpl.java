@@ -4,6 +4,9 @@ import com.bms.entity.CommonEmailMst;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +19,7 @@ import java.util.List;
 import static com.bms.util.CommonConstants.*;
 
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     private JavaMailSender mailSender;
@@ -25,6 +29,8 @@ public class EmailServiceImpl implements EmailService {
     private Integer maxRetryCount;
     @Value(FROM_MAIL)
     private String fromMail;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     @Override
     public void sendEmails() {
@@ -42,13 +48,14 @@ public class EmailServiceImpl implements EmailService {
                 helper.setFrom(fromMail);
                 helper.setTo(emailMst.getSendTo());
                 helper.setSubject(emailMst.getSubject());
-                helper.setText(emailMst.getSubject(), true);
+                helper.setText(emailMst.getContent(), true);
                 mailSender.send(message);
 
                 emailMst.setStatus(STATUS_SENT);
             } catch (Exception e) {
                 emailMst.setRetryCount(emailMst.getRetryCount() + 1);
-                emailMst.setStatus(maxRetryCount >= emailMst.getRetryCount() ? STATUS_FAILED : STATUS_UNSENT);
+                emailMst.setStatus(maxRetryCount <= emailMst.getRetryCount() ? STATUS_FAILED : STATUS_UNSENT);
+                LOGGER.error("Error while sending email", e);
             }
         }
 

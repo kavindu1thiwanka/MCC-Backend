@@ -18,6 +18,7 @@ public abstract class Mappings {
 
     // User Management Mappings
     public static final String REGISTER_USER_V1 = VERSION_V1 + "/register";
+    public static final String CONFIRM_USER_EMAIL_V1 = VERSION_V1 + "/confirm";
     public static final String UPDATE_USER_V1 = VERSION_V1 + "/update_user";
     public static final String ACTIVATE_USER_V1 = VERSION_V1 + "/activate_user";
     public static final String ACTIVATE_USER_BULK_V1 = VERSION_V1 + "/activate_user_bulk";

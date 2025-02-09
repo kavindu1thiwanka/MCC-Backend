@@ -10,9 +10,14 @@ public abstract class CommonConstants {
     public static final char STATUS_PAID = 'P';
     public static final char STATUS_NOT_PAID = 'N';
     public static final char STATUS_PARTIALLY_PAID = 'H';
-    public static final char STATUS_SENT = 'H';
-    public static final char STATUS_UNSENT = 'H';
+    public static final char STATUS_SENT = 'S';
+    public static final char STATUS_UNSENT = 'U';
     public static final char STATUS_FAILED = 'F';
+
+    public static final String EMPTY_STRING = "";
+    public static final String EMPTY_SPACE_STRING = " ";
+    public static final String CHARACTER_TYPE = "ISO-8859-1";
+    public static final String HREF_ATTR = "href";
 
     // Menu type constants
     public static final char MENU_TYPE_MAIN_MENU = 'M';
@@ -36,10 +41,19 @@ public abstract class CommonConstants {
     public static final String YML_CORS_ALLOW_ORIGINS = "${application.cors-allow-origins}";
     public static final String MAX_RETRY_COUNT = "${spring.mail.retry-count}";
     public static final String FROM_MAIL = "${spring.mail.from}";
+    public static final String CONFIRM_USER_EMAIL_URL = "${application.url.confirm-email}";
 
-    //Date Format
+    // Date Format
     public static final String US_DATE_FORMATS_STRING = "MM/dd/yyyy";
     public static final String PHOTON_OCR_DATE_FORMAT_STRING = "yyyy-MM-dd";
     public static final String SEPERATOR_LESS_DATE_FORMATS_STRING = "MMddyyyy";
     public static final String UNATTENDED_PAYMENT_DATE_FORMAT = "yyy-MM-dd HH:mm:ss";
+
+    // Email Template
+    public static final Integer EMAIL_TEMPLATE_CONFIGURE_USER = 1;
+
+    // Params
+    public static final String PARAM_EMAIL_SEND_TO = "EMAIL_SEND_TO";
+    public static final String PARAM_CONFIGURATION_URL = "CONFIGURATION_URL";
+    public static final String PARAM_UUID = "UUID";
 }

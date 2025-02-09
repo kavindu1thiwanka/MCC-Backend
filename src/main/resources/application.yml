@@ -10,12 +10,13 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: kavidu12thiwanka@gmail.com
-    password: test.Kavi1du#.12552
+    password: nifb rxor erve hoxw
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
     from: bms@info.com
     retry-count: 3
+
   datasource:
     url: jdbc:mysql://localhost:3307/business_management_system
     username: root
@@ -32,12 +33,14 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate.format_sql: true
 
 application:
+  url:
+    confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
   cors-allow-origins: http://localhost:4201
 
 jwt:
@@ -55,7 +58,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: kavidu12thiwanka@gmail.com
-    password: test.Kavi1du#.12552
+    password: nifb rxor erve hoxw
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -83,6 +86,8 @@ spring:
       hibernate.format_sql: true
 
 application:
+  url:
+    confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
   cors-allow-origins: http://localhost:4201
 
 jwt:
@@ -100,7 +105,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: kavidu12thiwanka@gmail.com
-    password: test.Kavi1du#.12552
+    password: nifb rxor erve hoxw
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
@@ -128,6 +133,8 @@ spring:
       hibernate.format_sql: true
 
 application:
+  url:
+    confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
   cors-allow-origins: http://localhost:4201
 
 jwt:

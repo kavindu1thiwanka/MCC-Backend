@@ -16,4 +16,7 @@ public interface UserMstRepository extends JpaRepository<UserMst, Integer> {
 
     @Query("SELECT mst FROM UserMst mst WHERE mst.email = :email AND mst.status <> :status")
     Optional<UserMst> findByEmailAndStatusNot(@Param("email") String email, @Param("status") Character status);
+
+    @Query("SELECT mst FROM UserMst mst WHERE mst.uuid = :uuid")
+    Optional<UserMst> findUserByUuid(@Param("uuid") String uuid);
 }

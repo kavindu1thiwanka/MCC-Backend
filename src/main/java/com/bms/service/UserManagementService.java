@@ -17,4 +17,6 @@ public interface UserManagementService {
     ResponseEntity<Object> deleteUser(Integer userId) throws BMSCheckedException;
 
     ResponseEntity<Object> getUserDetails(Integer userId);
+
+    ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException;
 }

@@ -23,11 +23,11 @@ public class CommonEmailMst extends CommonBaseEntity implements Serializable {
     @Column(name = "send_to", nullable = false)
     private String sendTo;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "retry_count")
-    private Integer retryCount;
+    private Integer retryCount = 0;
 
     @Column(name = "status", nullable = false)
     private Character status;

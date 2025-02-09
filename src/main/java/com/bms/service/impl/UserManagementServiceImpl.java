@@ -1,11 +1,19 @@
 package com.bms.service.impl;
 
 import com.bms.dto.UserDto;
+import com.bms.entity.CommonEmailMst;
+import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
+import com.bms.repository.CommonEmailMstRepository;
+import com.bms.repository.CommonEmailTemplateRepository;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.UserManagementService;
 import com.bms.util.BMSCheckedException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +37,13 @@ import static com.bms.util.ExceptionMessages.*;
 @Transactional
 public class UserManagementServiceImpl implements UserManagementService, UserDetailsService {
 
-    private UserMstRepository userMstRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private UserMstRepository userMstRepository;
+    private CommonEmailMstRepository commonEmailMstRepository;
+    private CommonEmailTemplateRepository commonEmailTemplateRepository;
+
+    @Value(CONFIRM_USER_EMAIL_URL)
+    private String confirmUserEmailUrl;
 
     /**
      * This method is used to register users (Customers & Drivers)
@@ -52,7 +65,44 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         userMst.setPassword(passwordEncoder.encode(user.getPassword()));
         userMstRepository.save(userMst);
 
+        sendConfirmationEmail(userMst);
+
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
+     * This method is used to send confirmation email to user
+     *
+     * @param userMst user details
+     */
+    private void sendConfirmationEmail(UserMst userMst) throws BMSCheckedException {
+
+        Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_CONFIGURE_USER);
+
+        if (templateOpt.isEmpty()) {
+            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+        }
+
+        CommonEmailTemplate emailTemplate = templateOpt.get();
+
+        Document html = Jsoup.parse(emailTemplate.getTemplateData(), CHARACTER_TYPE);
+
+        Element emailSendToElement = html.body().getElementById(PARAM_EMAIL_SEND_TO);
+        emailSendToElement.html(userMst.getFirstName().concat(EMPTY_SPACE_STRING).concat(userMst.getLastName() == null ? EMPTY_STRING : userMst.getLastName()));
+
+        Element configurationUrlElement = html.body().getElementById(PARAM_CONFIGURATION_URL);
+        configurationUrlElement.attr(HREF_ATTR, confirmUserEmailUrl.replace(PARAM_UUID, userMst.getUuid()));
+
+        CommonEmailMst commonEmailMst = new CommonEmailMst();
+        commonEmailMst.setSendTo(userMst.getEmail());
+        commonEmailMst.setSubject(emailTemplate.getSubject());
+        commonEmailMst.setContent(html.html());
+        commonEmailMst.setStatus(STATUS_UNSENT);
+
+        commonEmailMst.setCreatedOn(new Date());
+        commonEmailMst.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        commonEmailMstRepository.save(commonEmailMst);
     }
 
     /**
@@ -152,6 +202,33 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
+     * This method is used to confirm user email
+     *
+     * @param uuid uuid
+     * @return HttpStatus
+     */
+    @Override
+    public ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException {
+
+        Optional<UserMst> userOpt = userMstRepository.findUserByUuid(uuid);
+
+        if (userOpt.isEmpty()) {
+            throw new BMSCheckedException(USER_NOT_FOUND);
+        }
+
+        UserMst user = userOpt.get();
+
+        if (user.getStatus().equals(STATUS_ACTIVE)) {
+            throw new BMSCheckedException(USER_ALREADY_EXISTS);
+        }
+
+        user.setStatus(STATUS_ACTIVE);
+        userMstRepository.save(user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
      * This method is used to retrieve user details related to provided user id
      */
     private UserMst getExistingUser(Integer userId) {
@@ -241,5 +318,15 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     @Autowired
     public void setUserMstRepository(UserMstRepository userMstRepository) {
         this.userMstRepository = userMstRepository;
+    }
+
+    @Autowired
+    public void setCommonEmailMstRepository(CommonEmailMstRepository commonEmailMstRepository) {
+        this.commonEmailMstRepository = commonEmailMstRepository;
+    }
+
+    @Autowired
+    public void setCommonEmailTemplateRepository(CommonEmailTemplateRepository commonEmailTemplateRepository) {
+        this.commonEmailTemplateRepository = commonEmailTemplateRepository;
     }
 }

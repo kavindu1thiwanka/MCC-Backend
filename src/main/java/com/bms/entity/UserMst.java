@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import static com.bms.util.CommonConstants.*;
 
@@ -17,6 +18,9 @@ import static com.bms.util.CommonConstants.*;
 @Table(name = "user_mst")
 @EqualsAndHashCode(callSuper = true)
 public class UserMst extends CommonBaseEntity implements Serializable {
+
+    @Column(name = "uuid", nullable = false)
+    private String uuid;
 
     @Column(name = "username", nullable = false)
     private String username;
@@ -46,13 +50,14 @@ public class UserMst extends CommonBaseEntity implements Serializable {
     private Character status;
 
     public UserMst(UserDto user) {
+        this.uuid = UUID.randomUUID().toString();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.username = this.email;
         this.contactNumber = user.getContactNumber();
         this.driverLicenseNo = user.getDriverLicenseNo();
-        this.status = STATUS_ACTIVE;
+        this.status = STATUS_INACTIVE;
 
         switch (user.getIdentifier()) {
             case IDENTIFIER_ROLE_CUSTOMER:

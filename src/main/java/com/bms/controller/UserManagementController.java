@@ -20,6 +20,11 @@ public class UserManagementController {
         return userManagementService.registerUser(user);
     }
 
+    @GetMapping(CONFIRM_USER_EMAIL_V1)
+    public ResponseEntity<Object> confirmUserEmail(@RequestParam String uuid) throws BMSCheckedException {
+        return userManagementService.confirmUserEmail(uuid);
+    }
+
     @PutMapping(UPDATE_USER_V1)
     public ResponseEntity<Object> updateUser(@RequestBody UserDto user) throws BMSCheckedException {
         return userManagementService.updateUser(user);

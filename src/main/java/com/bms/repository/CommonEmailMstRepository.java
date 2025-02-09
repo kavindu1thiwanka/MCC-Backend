@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-import static com.bms.util.CommonConstants.STATUS_SENT;
 import static com.bms.util.CommonConstants.STATUS_UNSENT;
 
 public interface CommonEmailMstRepository extends JpaRepository<CommonEmailMst, Integer> {
