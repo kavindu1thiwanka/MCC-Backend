@@ -56,4 +56,9 @@ public abstract class CommonConstants {
     public static final String PARAM_EMAIL_SEND_TO = "EMAIL_SEND_TO";
     public static final String PARAM_CONFIGURATION_URL = "CONFIGURATION_URL";
     public static final String PARAM_UUID = "UUID";
+
+    // SQL Query Constants
+    public static final String SQL_AND = "AND";
+    public static final String SQL_OR = "OR";
+    public static final String SQL_ORDER_BY = "ORDER BY";
 }
