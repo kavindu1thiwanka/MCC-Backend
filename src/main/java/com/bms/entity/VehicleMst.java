@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -36,6 +37,9 @@ public class VehicleMst implements Serializable {
 
     @Column(name = "availability", nullable = false)
     private Character availability;
+
+    @Column(name = "price", nullable = false)
+    private BigDecimal priceForDay;
 
     @Column(name = "status", nullable = false)
     private Character status;
