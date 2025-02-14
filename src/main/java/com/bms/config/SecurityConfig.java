@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/user/v1/register").permitAll()
                         .requestMatchers("/user/v1/confirm").permitAll()
+                        .requestMatchers("/vehicle/v1/get_vehicle_list").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
