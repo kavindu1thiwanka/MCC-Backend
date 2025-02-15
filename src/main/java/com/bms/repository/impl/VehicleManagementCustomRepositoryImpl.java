@@ -25,7 +25,6 @@ public class VehicleManagementCustomRepositoryImpl implements VehicleManagementC
                 "FROM VehicleMst car WHERE car.status='A' AND car.availability='Y' AND car.category='" +  commonFilterDto.getCategory() + "'";
         sql = setConditions(sql, commonFilterDto);
         sql = setOrderBy(sql, commonFilterDto);
-        System.out.println(sql);
         Query query = entityManager.createQuery(sql);
         return query.getResultList();
     }
