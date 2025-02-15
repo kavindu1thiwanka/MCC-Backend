@@ -26,6 +26,9 @@ public class VehicleMst implements Serializable {
     @Column(name = "vehicle_type", nullable = false)
     private String vehicleType;
 
+    @Column(name = "category", nullable = false)
+    private String category;
+
     @Column(name = "seats", nullable = false)
     private Integer seats;
 

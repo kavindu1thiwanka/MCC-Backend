@@ -10,5 +10,6 @@ import java.util.List;
 public class CommonFilterDto {
 
     private String sortBy;
+    private String category;
     private List<String> filters;
 }
