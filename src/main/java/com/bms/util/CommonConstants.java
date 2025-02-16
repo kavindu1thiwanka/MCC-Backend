@@ -24,9 +24,9 @@ public abstract class CommonConstants {
     public static final char MENU_TYPE_SUB_MENU = 'S';
 
     // Roles
-    public static final Integer ROLE_ID_ADMIN = 1;
-    public static final Integer ROLE_ID_CUSTOMER = 2;
-    public static final Integer ROLE_ID_DRIVER = 3;
+    public static final int ROLE_ID_ADMIN = 1;
+    public static final int ROLE_ID_CUSTOMER = 2;
+    public static final int ROLE_ID_DRIVER = 3;
 
     public static final String ROLE_ADMIN = "RL_ADMIN";
     public static final String ROLE_CUSTOMER = "RL_CUSTOMER";

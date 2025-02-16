@@ -4,6 +4,7 @@ import com.bms.dto.ReservationDto;
 import com.bms.entity.ReservationMst;
 import com.bms.entity.UserMst;
 import com.bms.repository.ReservationMstRepository;
+import com.bms.repository.UserMstRepository;
 import com.bms.service.ReservationManagementService;
 import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 import static com.bms.util.ExceptionMessages.*;
 
@@ -22,6 +24,7 @@ import static com.bms.util.ExceptionMessages.*;
 public class ReservationManagementServiceImpl implements ReservationManagementService {
 
     private ReservationMstRepository reservationMstRepository;
+    private UserMstRepository userMstRepository;
 
     /**
      * This method is used to create new reservation
@@ -40,6 +43,18 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         reservationMst.setUserId(user.getId());
         reservationMst.setCreatedBy(user.getEmail());
         reservationMst.setCreatedOn(new Date());
+
+        if (Boolean.TRUE.equals(reservationDto.getNeedDriver())) {
+            List<UserMst> allDrivers = userMstRepository.getAllAvailableDrivers();
+
+            if (!allDrivers.isEmpty()) {
+                reservationMst.setDriverId(allDrivers.getFirst().getId());
+            }
+
+            reservationMst.setDriverId(reservationMstRepository
+                    .getReservationUnavailableDrivers(reservationMst.getPickUpDate(), reservationMst.getReturnDate())
+                    .getFirst());
+        }
         reservationMstRepository.save(reservationMst);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -53,10 +68,6 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     private void validateTransaction(ReservationDto reservationDto) throws BMSCheckedException {
         if (reservationDto.getVehicleNo() == null || reservationDto.getVehicleNo().isEmpty()) {
             throw new BMSCheckedException(VEHICLE_NO_CANNOT_BE_EMPTY);
-        }
-
-        if (reservationDto.getNeedDriver() && reservationDto.getDriverId() == null) {
-            throw new BMSCheckedException(DRIVER_ID_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getPickUpDate() == null) {
@@ -75,5 +86,10 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     @Autowired
     public void setReservationMstRepository(ReservationMstRepository reservationMstRepository) {
         this.reservationMstRepository = reservationMstRepository;
+    }
+
+    @Autowired
+    public void setUserMstRepository(UserMstRepository userMstRepository) {
+        this.userMstRepository = userMstRepository;
     }
 }
