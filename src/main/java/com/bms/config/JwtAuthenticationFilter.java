@@ -2,9 +2,7 @@ package com.bms.config;
 
 import com.bms.entity.UserMst;
 import com.bms.repository.PrivilegeMstRepository;
-import com.bms.repository.RoleMstRepository;
 import com.bms.repository.UserMstRepository;
-import com.bms.repository.UserWiseRolesRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,23 +20,19 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.*;
-import static com.bms.util.CommonConstant.ROLE_STUDENT;
-
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtUtil jwtUtil;
     private UserMstRepository userMstRepository;
     private PrivilegeMstRepository privilegeMstRepository;
-    private UserWiseRolesRepository userWiseRolesRepository;
-    private RoleMstRepository roleMstRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        if (request.getRequestURI().startsWith("/auth/")) {
+        if (request.getRequestURI().startsWith("/auth/") || request.getRequestURI().equals("/user/v1/register")
+                || request.getRequestURI().equals("/user/v1/confirm") || request.getRequestURI().equals("/vehicle/v1/get_vehicle_list")) {
             chain.doFilter(request, response);
             return;
         }
@@ -58,56 +52,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtUtil.extractUsername(jwt);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or expired token");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
             return;
         }
 
         if (username != null && jwtUtil.validateToken(jwt, username)) {
 
             Optional<UserMst> userOpt = userMstRepository.findByUsername(username);
+
             if (userOpt.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("User not found");
+                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "User not found");
                 return;
             }
 
             UserMst user = userOpt.get();
 
-            user.setRoleIdList(userWiseRolesRepository.getRoleIdListByUserId(user.getId()));
-            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleIdList(user.getRoleIdList());
-            Set<Integer> mainRoleIdList = roleMstRepository.getMainRoleIdList(user.getRoleIdList());
-
-            if (mainRoleIdList.contains(ROLE_ID_ADMIN)) {
-                user.getRoleList().add(ROLE_ADMIN);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_TEACHER)) {
-                user.getRoleList().add(ROLE_TEACHER);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_STUDENT)) {
-                user.getRoleList().add(ROLE_STUDENT);
-            }
+            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
 
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
                     null, grantAuthorityCodes(authCodes)));
 
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token is invalid or expired");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
             return;
         }
 
-        chain.doFilter(request, response);
+        try {
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            if (response.getStatus() == HttpServletResponse.SC_OK) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+            sendErrorResponse(response, response.getStatus(), e.getCause().getMessage());
+        }
     }
 
-    public Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
+    /**
+     * This method is used to generate a list of GrantedAuthority objects from
+     * the auth codes that the user has.
+     */
+    private Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
         Set<GrantedAuthority> authorityList = new HashSet<>();
         authCodes.forEach((authority) -> {
             authorityList.add(new SimpleGrantedAuthority(authority));
         });
         return authorityList;
+    }
+
+    /**
+     * Helper method to send JSON error responses with correct status codes.
+     */
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"status\":" + status + ",\"message\":\"" + message + "\"}");
     }
 
     @Autowired
@@ -125,13 +123,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.privilegeMstRepository = privilegeMstRepository;
     }
 
-    @Autowired
-    public void setUserWiseRolesRepository(UserWiseRolesRepository userWiseRolesRepository) {
-        this.userWiseRolesRepository = userWiseRolesRepository;
-    }
-
-    @Autowired
-    public void setRoleMstRepository(RoleMstRepository roleMstRepository) {
-        this.roleMstRepository = roleMstRepository;
-    }
 }

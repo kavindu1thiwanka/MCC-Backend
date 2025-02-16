@@ -19,7 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-import static com.bms.util.CommonConstant.YML_CORS_ALLOW_ORIGINS;
+import static com.bms.util.CommonConstants.YML_CORS_ALLOW_ORIGINS;
 
 @Configuration
 public class SecurityConfig {
@@ -42,6 +42,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/user/v1/register").permitAll()
+                        .requestMatchers("/user/v1/confirm").permitAll()
+                        .requestMatchers("/vehicle/v1/get_vehicle_list").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

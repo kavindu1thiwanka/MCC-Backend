@@ -17,5 +17,7 @@ public class UserDto {
     private String email;
     private Integer roleId;
     private String contactNumber;
+    private String driverLicenseNo;
     private Character status;
+    private String identifier;
 }

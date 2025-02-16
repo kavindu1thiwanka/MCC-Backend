@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "menu_privileges")
-public class MenuPrivileges {
+public class MenuPrivileges implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

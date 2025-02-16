@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-import static com.bms.util.CommonConstant.JWT_SECRET;
+import static com.bms.util.CommonConstants.JWT_SECRET;
 
 @Component
 public class JwtUtil {

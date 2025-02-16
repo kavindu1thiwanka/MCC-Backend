@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "privilege_mst")
-public class PrivilegeMst {
+public class PrivilegeMst implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

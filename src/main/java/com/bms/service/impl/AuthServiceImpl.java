@@ -4,10 +4,9 @@ import com.bms.config.JwtUtil;
 import com.bms.dto.AuthRequestDto;
 import com.bms.entity.UserMst;
 import com.bms.repository.PrivilegeMstRepository;
-import com.bms.repository.RoleMstRepository;
 import com.bms.repository.UserMstRepository;
-import com.bms.repository.UserWiseRolesRepository;
 import com.bms.service.AuthService;
+import com.bms.util.ExceptionMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +18,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.bms.util.CommonConstant.*;
-
 @Service
+@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private AuthenticationManager authenticationManager;
@@ -35,44 +34,29 @@ public class AuthServiceImpl implements AuthService {
 
     private UserMstRepository userMstRepository;
     private PrivilegeMstRepository privilegeMstRepository;
-    private UserWiseRolesRepository userWiseRolesRepository;
-    private RoleMstRepository roleMstRepository;
 
     @Override
     public ResponseEntity<Object> authenticateUser(AuthRequestDto authRequest) {
         Authentication authentication;
+        UserMst user;
         try {
 
             Optional<UserMst> userOptional = userMstRepository.findByUsername(authRequest.getUsername());
             if (userOptional.isEmpty()) {
-                return new ResponseEntity<>("User not found", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(ExceptionMessages.USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
             }
 
-            UserMst user = userOptional.get();
+            user = userOptional.get();
 
             if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
-                return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(ExceptionMessages.INVALID_PASSWORD, HttpStatus.UNAUTHORIZED);
             }
 
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
-            user.setRoleIdList(userWiseRolesRepository.getRoleIdListByUserId(user.getId()));
-            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleIdList(user.getRoleIdList());
-            Set<Integer> mainRoleIdList = roleMstRepository.getMainRoleIdList(user.getRoleIdList());
-
-            if (mainRoleIdList.contains(ROLE_ID_ADMIN)) {
-                user.getRoleList().add(ROLE_ADMIN);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_TEACHER)) {
-                user.getRoleList().add(ROLE_TEACHER);
-            }
-
-            if (mainRoleIdList.contains(ROLE_ID_STUDENT)) {
-                user.getRoleList().add(ROLE_STUDENT);
-            }
+            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
 
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
                     null, grantAuthorityCodes(authCodes)));
@@ -81,8 +65,7 @@ public class AuthServiceImpl implements AuthService {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
-        // Generate JWT if authentication is successful
-        return new ResponseEntity<>(new AuthRequestDto(jwtUtil.generateToken(authentication.getName())), HttpStatus.OK);
+        return new ResponseEntity<>(new AuthRequestDto(jwtUtil.generateToken(authentication.getName()), user), HttpStatus.OK);
     }
 
     public Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
@@ -118,13 +101,4 @@ public class AuthServiceImpl implements AuthService {
         this.privilegeMstRepository = privilegeMstRepository;
     }
 
-    @Autowired
-    public void setUserWiseRolesRepository(UserWiseRolesRepository userWiseRolesRepository) {
-        this.userWiseRolesRepository = userWiseRolesRepository;
-    }
-
-    @Autowired
-    public void setRoleMstRepository(RoleMstRepository roleMstRepository) {
-        this.roleMstRepository = roleMstRepository;
-    }
 }
