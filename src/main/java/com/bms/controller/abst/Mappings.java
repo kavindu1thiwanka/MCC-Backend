@@ -9,6 +9,7 @@ public abstract class Mappings {
     public static final String MENU = "/menu";
     public static final String VEHICLE = "/vehicle";
     public static final String RESERVATION = "/res";
+    public static final String PAYMENTS = "/payments";
 
     // Version Mappings
     public static final String VERSION_V1 = "/v1";
@@ -49,4 +50,7 @@ public abstract class Mappings {
 
     // Reservation Management Mappings
     public static final String CREATE_RESERVATION_V1 = VERSION_V1 + "/create_reservation";
+
+    // Payment Management Mappings
+    public static final String CREATE_PAYMENT_SESSION = "/create-payment-session";
 }
