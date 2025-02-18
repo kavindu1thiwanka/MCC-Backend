@@ -2,6 +2,7 @@ package com.bms.controller;
 
 import com.bms.service.StripeService;
 import com.stripe.exception.StripeException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -12,7 +13,7 @@ import static com.bms.controller.abst.Mappings.PAYMENTS;
 
 @RestController
 @RequestMapping(PAYMENTS)
-@CrossOrigin("*")
+//@CrossOrigin("*")
 @RequestScope
 public class StripeController {
 
@@ -23,7 +24,7 @@ public class StripeController {
     }
 
     @PostMapping(CREATE_PAYMENT_SESSION)
-    public Map<String, String> createPaymentIntent(@RequestBody Map<String, Object> requestBody) throws StripeException {
+    public ResponseEntity<Map<String, String>> createCheckoutSession(@RequestBody Map<String, Object> requestBody) throws StripeException {
         return stripeService.createCheckoutSession(requestBody);
     }
 }

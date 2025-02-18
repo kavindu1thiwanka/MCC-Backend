@@ -6,6 +6,8 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,10 +26,10 @@ public class StripeServiceImpl implements StripeService {
     private String cancelUrl;
 
     @Override
-    public Map<String, String> createCheckoutSession(Map<String, Object> requestBody) throws StripeException {
+    public ResponseEntity<Map<String, String>> createCheckoutSession(Map<String, Object> requestBody) throws StripeException {
         Stripe.apiKey = stripeApiKey;
         Long amount = Long.parseLong(requestBody.get("amount").toString());
-        String currency = requestBody.get("currency").toString();
+//        String currency = requestBody.get("currency").toString();
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -38,7 +40,7 @@ public class StripeServiceImpl implements StripeService {
                                 .setQuantity(1L)
                                 .setPriceData(
                                         SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency(currency)
+                                                .setCurrency("USD")
                                                 .setUnitAmount(amount * 100)
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
@@ -55,6 +57,6 @@ public class StripeServiceImpl implements StripeService {
 
         Map<String, String> response = new HashMap<>();
         response.put("checkoutUrl", session.getUrl());
-        return response;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
