@@ -15,14 +15,23 @@ public class JwtUtil {
     @Value(JWT_SECRET)
     private String secretKey;
 
-    private final long expirationTime = 1000 * 60 * 60; // 1 hour
+    private final long accessTokenExpiration = 1000 * 60 * 30;
+    private final long refreshTokenExpiration = 1000 * 60 * 60 * 24 * 7;
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
+        return generateToken(username, accessTokenExpiration);
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateToken(username, refreshTokenExpiration);
+    }
+
+    private String generateToken(String username, long expiration) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes())) // Use the key from properties
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .compact();
     }
 

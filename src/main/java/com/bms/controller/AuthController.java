@@ -6,8 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.bms.controller.abst.Mappings.AUTH;
-import static com.bms.controller.abst.Mappings.LOGIN_V1;
+import static com.bms.controller.abst.Mappings.*;
 
 @RestController
 @RequestMapping(AUTH)
@@ -18,6 +17,11 @@ public class AuthController {
     @PostMapping(LOGIN_V1)
     public ResponseEntity<Object> login(@RequestBody AuthRequestDto authRequest) {
         return authService.authenticateUser(authRequest);
+    }
+
+    @PostMapping(REFRESH_V1)
+    public ResponseEntity<Object> refresh(@RequestBody AuthRequestDto refreshTokenRequest) {
+        return authService.refreshToken(refreshTokenRequest);
     }
 
     @Autowired
