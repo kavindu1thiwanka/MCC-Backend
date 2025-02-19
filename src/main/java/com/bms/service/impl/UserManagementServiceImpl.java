@@ -1,6 +1,8 @@
 package com.bms.service.impl;
 
+import com.bms.dto.AddressDto;
 import com.bms.dto.UserDto;
+import com.bms.entity.AddressMst;
 import com.bms.entity.CommonEmailMst;
 import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
@@ -239,6 +241,37 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return new ResponseEntity<>(addressMstRepository.getAddressMstByUserName(user.getUsername()), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to update current logged-in user's address
+     *
+     * @param address updated address details
+     * @return HttpStatus
+     */
+    @Override
+    public ResponseEntity<Object> updateUserAddress(AddressDto address) {
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        AddressMst existingAddress = addressMstRepository.getAddressMstByUserName(user.getUsername());
+
+        if (existingAddress == null) {
+            existingAddress = AddressMst.builder()
+                    .userId(user.getId())
+                    .addressLine1(address.getAddressLine1())
+                    .addressLine2(address.getAddressLine2())
+                    .city(address.getCity())
+                    .state(address.getState())
+                    .country(address.getCountry())
+                    .postalCode(address.getPostalCode())
+                    .build();
+        } else {
+            existingAddress.copyAddressDetails(address);
+        }
+        addressMstRepository.save(existingAddress);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.bms.controller;
 
+import com.bms.dto.AddressDto;
 import com.bms.dto.UserDto;
 import com.bms.service.UserManagementService;
 import com.bms.util.BMSCheckedException;
@@ -50,9 +51,14 @@ public class UserManagementController {
         return userManagementService.getUserDetails(userId);
     }
 
-    @GetMapping(IS_ADDRESS_AVAILABLE_V1)
+    @GetMapping(GET_USER_ADDRESS_V1)
     public ResponseEntity<Object> getUserAddress() {
         return userManagementService.getUserAddress();
+    }
+
+    @PutMapping(UPDATE_USER_ADDRESS_V1)
+    public ResponseEntity<Object> updateUserAddress(@RequestBody AddressDto address) throws BMSCheckedException {
+        return userManagementService.updateUserAddress(address);
     }
 
     @Autowired

@@ -30,6 +30,7 @@ public abstract class Mappings {
     public static final String GET_ALL_USERS_V1 = VERSION_V1 + "/get_all_users";
     public static final String GET_USER_DETAILS_V1 = VERSION_V1 + "/get_user_details";
     public static final String GET_USER_ADDRESS_V1 = VERSION_V1 + "/get_user_address";
+    public static final String UPDATE_USER_ADDRESS_V1 = VERSION_V1 + "/update_user_address";
 
     // Role Management Mappings
     public static final String CREATE_ROLE_V1 = VERSION_V1 + "/create_role";

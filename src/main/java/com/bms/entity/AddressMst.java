@@ -1,6 +1,9 @@
 package com.bms.entity;
 
+import com.bms.dto.AddressDto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "address_mst")
+@Builder
+@AllArgsConstructor
 public class AddressMst {
 
     @Id
@@ -35,4 +40,13 @@ public class AddressMst {
 
     @Column(name = "postal_code")
     private String postalCode;
+
+    public void copyAddressDetails(AddressDto address) {
+        this.addressLine1 = address.getAddressLine1();
+        this.addressLine2 = address.getAddressLine2();
+        this.city = address.getCity();
+        this.state = address.getState();
+        this.country = address.getCountry();
+        this.postalCode = address.getPostalCode();
+    }
 }
