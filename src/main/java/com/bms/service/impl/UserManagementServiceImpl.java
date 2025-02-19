@@ -231,11 +231,11 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
-     * This method is used to check if address is available for provided user id
+     * This method is used to get user address
      *
      */
     @Override
-    public ResponseEntity<Object> isAddressAvailable() {
+    public ResponseEntity<Object> getUserAddress() {
 
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return new ResponseEntity<>(addressMstRepository.getAddressMstByUserName(user.getUsername()), HttpStatus.OK);

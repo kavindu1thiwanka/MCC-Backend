@@ -51,8 +51,8 @@ public class UserManagementController {
     }
 
     @GetMapping(IS_ADDRESS_AVAILABLE_V1)
-    public ResponseEntity<Object> isAddressAvailable() {
-        return userManagementService.isAddressAvailable();
+    public ResponseEntity<Object> getUserAddress() {
+        return userManagementService.getUserAddress();
     }
 
     @Autowired
