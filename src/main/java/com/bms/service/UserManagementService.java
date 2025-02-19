@@ -19,4 +19,6 @@ public interface UserManagementService {
     ResponseEntity<Object> getUserDetails(Integer userId);
 
     ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException;
+
+    ResponseEntity<Object> isAddressAvailable();
 }

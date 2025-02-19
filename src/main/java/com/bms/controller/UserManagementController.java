@@ -50,6 +50,11 @@ public class UserManagementController {
         return userManagementService.getUserDetails(userId);
     }
 
+    @GetMapping(IS_ADDRESS_AVAILABLE_V1)
+    public ResponseEntity<Object> isAddressAvailable() {
+        return userManagementService.isAddressAvailable();
+    }
+
     @Autowired
     public void setUserManagementService(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;

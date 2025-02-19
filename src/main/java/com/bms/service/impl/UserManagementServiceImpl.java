@@ -4,6 +4,7 @@ import com.bms.dto.UserDto;
 import com.bms.entity.CommonEmailMst;
 import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
+import com.bms.repository.AddressMstRepository;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.repository.CommonEmailTemplateRepository;
 import com.bms.repository.UserMstRepository;
@@ -41,6 +42,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     private UserMstRepository userMstRepository;
     private CommonEmailMstRepository commonEmailMstRepository;
     private CommonEmailTemplateRepository commonEmailTemplateRepository;
+    private AddressMstRepository addressMstRepository;
 
     @Value(CONFIRM_USER_EMAIL_URL)
     private String confirmUserEmailUrl;
@@ -229,6 +231,17 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
+     * This method is used to check if address is available for provided user id
+     *
+     */
+    @Override
+    public ResponseEntity<Object> isAddressAvailable() {
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new ResponseEntity<>(addressMstRepository.getAddressMstByUserName(user.getUsername()), HttpStatus.OK);
+    }
+
+    /**
      * This method is used to retrieve user details related to provided user id
      */
     private UserMst getExistingUser(Integer userId) {
@@ -328,5 +341,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     @Autowired
     public void setCommonEmailTemplateRepository(CommonEmailTemplateRepository commonEmailTemplateRepository) {
         this.commonEmailTemplateRepository = commonEmailTemplateRepository;
+    }
+
+    @Autowired
+    public void setAddressMstRepository(AddressMstRepository addressMstRepository) {
+        this.addressMstRepository = addressMstRepository;
     }
 }
