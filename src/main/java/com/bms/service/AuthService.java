@@ -6,4 +6,6 @@ import org.springframework.http.ResponseEntity;
 public interface AuthService {
 
     ResponseEntity<Object> authenticateUser(AuthRequestDto authRequest);
+
+    ResponseEntity<Object> refreshToken(AuthRequestDto request);
 }

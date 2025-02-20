@@ -47,13 +47,12 @@ public class ReservationMst extends CommonBaseEntity implements Serializable {
 
     public ReservationMst(ReservationDto reservationDto) {
         this.vehicleNo = reservationDto.getVehicleNo();
-        this.driverId = reservationDto.getNeedDriver() ? reservationDto.getDriverId() : null;
         this.pickUpDate = reservationDto.getPickUpDate();
         this.returnDate = reservationDto.getReturnDate();
         this.pickUpLocation = reservationDto.getPickUpLocation();
         this.returnLocation = reservationDto.getReturnLocation() == null || reservationDto.getReturnLocation().isEmpty()
                 ? reservationDto.getPickUpLocation() : reservationDto.getReturnLocation();
-        this.status = CommonConstants.STATUS_ACTIVE;
+        this.status = CommonConstants.STATUS_INACTIVE;
         this.paymentStatus = CommonConstants.STATUS_NOT_PAID;
     }
 }

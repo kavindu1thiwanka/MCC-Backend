@@ -21,7 +21,7 @@ public class VehicleManagementCustomRepositoryImpl implements VehicleManagementC
     @Override
     public List<VehicleMstDto> getVehicleList(CommonFilterDto commonFilterDto) {
 
-        String sql = "SELECT new com.bms.dto.VehicleMstDto(car.vehicleNo, car.vehicleModel, car.vehicleType, car.seats, car.gearType, car.vehicleImage) " +
+        String sql = "SELECT new com.bms.dto.VehicleMstDto(car.vehicleNo, car.vehicleModel, car.vehicleType, car.seats, car.gearType, car.vehicleImage, car.pricePerDay) " +
                 "FROM VehicleMst car WHERE car.status='A' AND car.availability='Y' AND car.category='" +  commonFilterDto.getCategory() + "'";
         sql = setConditions(sql, commonFilterDto);
         sql = setOrderBy(sql, commonFilterDto);

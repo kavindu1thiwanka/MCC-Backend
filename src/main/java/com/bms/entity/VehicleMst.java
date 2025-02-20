@@ -42,7 +42,7 @@ public class VehicleMst implements Serializable {
     private Character availability;
 
     @Column(name = "price", nullable = false)
-    private BigDecimal priceForDay;
+    private BigDecimal pricePerDay;
 
     @Column(name = "status", nullable = false)
     private Character status;

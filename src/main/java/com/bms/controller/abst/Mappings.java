@@ -9,12 +9,14 @@ public abstract class Mappings {
     public static final String MENU = "/menu";
     public static final String VEHICLE = "/vehicle";
     public static final String RESERVATION = "/res";
+    public static final String PAYMENTS = "/payments";
 
     // Version Mappings
     public static final String VERSION_V1 = "/v1";
 
     // Auth Mappings
     public static final String LOGIN_V1 = VERSION_V1 + "/login";
+    public static final String REFRESH_V1 = VERSION_V1 + "/refresh";
 
     // User Management Mappings
     public static final String REGISTER_USER_V1 = VERSION_V1 + "/register";
@@ -28,6 +30,8 @@ public abstract class Mappings {
     public static final String DELETE_USER_BULK_V1 = VERSION_V1 + "/delete_user_bulk";
     public static final String GET_ALL_USERS_V1 = VERSION_V1 + "/get_all_users";
     public static final String GET_USER_DETAILS_V1 = VERSION_V1 + "/get_user_details";
+    public static final String GET_USER_ADDRESS_V1 = VERSION_V1 + "/get_user_address";
+    public static final String UPDATE_USER_ADDRESS_V1 = VERSION_V1 + "/update_user_address";
 
     // Role Management Mappings
     public static final String CREATE_ROLE_V1 = VERSION_V1 + "/create_role";
@@ -49,4 +53,7 @@ public abstract class Mappings {
 
     // Reservation Management Mappings
     public static final String CREATE_RESERVATION_V1 = VERSION_V1 + "/create_reservation";
+
+    // Payment Management Mappings
+    public static final String CREATE_PAYMENT_SESSION = "/create-payment-session";
 }

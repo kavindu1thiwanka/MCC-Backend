@@ -31,48 +31,66 @@ public class AuthServiceImpl implements AuthService {
     private AuthenticationManager authenticationManager;
     private PasswordEncoder passwordEncoder;
     private JwtUtil jwtUtil;
-
     private UserMstRepository userMstRepository;
     private PrivilegeMstRepository privilegeMstRepository;
 
     @Override
     public ResponseEntity<Object> authenticateUser(AuthRequestDto authRequest) {
-        Authentication authentication;
-        UserMst user;
         try {
-
             Optional<UserMst> userOptional = userMstRepository.findByUsername(authRequest.getUsername());
             if (userOptional.isEmpty()) {
                 return new ResponseEntity<>(ExceptionMessages.USER_NOT_FOUND, HttpStatus.UNAUTHORIZED);
             }
 
-            user = userOptional.get();
+            UserMst user = userOptional.get();
 
             if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
                 return new ResponseEntity<>(ExceptionMessages.INVALID_PASSWORD, HttpStatus.UNAUTHORIZED);
             }
 
-            authentication = authenticationManager.authenticate(
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
             Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
 
-            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
-                    null, grantAuthorityCodes(authCodes)));
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                            user, null, grantAuthorityCodes(authCodes)));
+
+            AuthRequestDto response = new AuthRequestDto(
+                    jwtUtil.generateAccessToken(authentication.getName()),
+                    jwtUtil.generateRefreshToken(authentication.getName()),
+                    user);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
+    }
 
-        return new ResponseEntity<>(new AuthRequestDto(jwtUtil.generateToken(authentication.getName()), user), HttpStatus.OK);
+    @Override
+    public ResponseEntity<Object> refreshToken(AuthRequestDto request) {
+        try {
+            String refreshToken = request.getRefreshToken();
+            String username = jwtUtil.extractUsername(refreshToken);
+
+            if (jwtUtil.validateToken(refreshToken, username)) {
+                String newAccessToken = jwtUtil.generateAccessToken(username);
+                return new ResponseEntity<>(new AuthRequestDto(newAccessToken, refreshToken), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Invalid refresh token.", HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
     }
 
     public Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
         Set<GrantedAuthority> authorityList = new HashSet<>();
-        authCodes.forEach((authority) -> {
-            authorityList.add(new SimpleGrantedAuthority(authority));
-        });
+        authCodes.forEach(auth -> authorityList.add(new SimpleGrantedAuthority(auth)));
         return authorityList;
     }
 
@@ -100,5 +118,4 @@ public class AuthServiceImpl implements AuthService {
     public void setPrivilegeMstRepository(PrivilegeMstRepository privilegeMstRepository) {
         this.privilegeMstRepository = privilegeMstRepository;
     }
-
 }

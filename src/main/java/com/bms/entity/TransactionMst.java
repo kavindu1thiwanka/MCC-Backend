@@ -2,11 +2,10 @@ package com.bms.entity;
 
 import com.bms.entity.abst.CommonBaseEntity;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -20,7 +19,7 @@ public class TransactionMst extends CommonBaseEntity implements Serializable {
     private Integer reservationId;
 
     @Column(name = "amount", nullable = false)
-    private Double amount;
+    private BigDecimal amount;
 
     @Column(name = "payment_type", nullable = false)
     private Integer paymentType;
