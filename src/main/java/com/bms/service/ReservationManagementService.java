@@ -8,4 +8,6 @@ import org.springframework.http.ResponseEntity;
 public interface ReservationManagementService {
 
     ResponseEntity<Object> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException;
+
+    ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException;
 }

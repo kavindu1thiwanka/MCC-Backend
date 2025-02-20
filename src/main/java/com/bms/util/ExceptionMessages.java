@@ -34,4 +34,8 @@ public abstract class ExceptionMessages {
     // Email Related Exceptions
     public static final String EMAIL_TEMPLATE_NOT_FOUND = "Email template not found";
 
+    // Reservation & Payment Related Exceptions
+    public static final String RESERVATION_NOT_FOUND = "Reservation not found";
+    public static final String TRANSACTION_NOT_FOUND = "Transaction not found";
+
 }

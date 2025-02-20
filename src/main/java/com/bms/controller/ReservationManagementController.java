@@ -6,14 +6,10 @@ import com.bms.util.BMSCheckedException;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 
-import static com.bms.controller.abst.Mappings.CREATE_RESERVATION_V1;
-import static com.bms.controller.abst.Mappings.RESERVATION;
+import static com.bms.controller.abst.Mappings.*;
 
 @RestController
 @RequestScope
@@ -25,6 +21,11 @@ public class ReservationManagementController {
     @PostMapping(CREATE_RESERVATION_V1)
     public ResponseEntity<Object> createReservation(@RequestBody ReservationDto reservationDto) throws BMSCheckedException, StripeException {
         return reservationManagementService.createReservation(reservationDto);
+    }
+
+    @PutMapping(UPDATE_RESERVATION_DETAILS_V1)
+    public ResponseEntity<Object> updateReservationDetails(@RequestParam Integer trxId, @RequestParam Character paymentStatus) throws BMSCheckedException {
+        return reservationManagementService.updateReservationDetails(trxId, paymentStatus);
     }
 
     @Autowired

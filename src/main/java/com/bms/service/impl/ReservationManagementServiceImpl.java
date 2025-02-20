@@ -10,7 +10,6 @@ import com.bms.repository.UserMstRepository;
 import com.bms.service.ReservationManagementService;
 import com.bms.service.StripeService;
 import com.bms.util.BMSCheckedException;
-import com.bms.util.CommonConstants;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
@@ -64,7 +64,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         transactionMst.setAmount(reservationDto.getAmount());
         transactionMst.setPaymentType(PAYMENT_TYPE_CARD);
         transactionMst.setPaymentDate(new Date());
-        transactionMst.setStatus(STATUS_PAYMENT_PENDING);
+        transactionMst.setStatus(STATUS_TRANSACTION_PENDING);
         transactionMst.setCreatedBy(user.getEmail());
         transactionMst.setCreatedOn(new Date());
         transactionMstRepository.save(transactionMst);
@@ -75,6 +75,43 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         map.put(STRING_TRANSACTION_ID, transactionMst.getId());
 
         return new ResponseEntity<>(stripeService.createCheckoutSession(map), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to update reservation's status and transaction status
+     *
+     * @param trxId         transaction id
+     * @param paymentStatus payment status
+     * @return HttpStatus
+     */
+    @Override
+    public ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException {
+        Optional<TransactionMst> transactionOpt = transactionMstRepository.findById(trxId);
+
+        if (transactionOpt.isEmpty()) {
+            throw new BMSCheckedException(TRANSACTION_NOT_FOUND);
+        }
+
+        TransactionMst transactionMst = transactionOpt.get();
+        transactionMst.setStatus(paymentStatus);
+        transactionMst.setUpdateOn(new Date());
+        transactionMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        transactionMstRepository.save(transactionMst);
+
+        Optional<ReservationMst> reservationOpt = reservationMstRepository.findById(transactionMst.getReservationId());
+
+        if (reservationOpt.isEmpty()) {
+            throw new BMSCheckedException(RESERVATION_NOT_FOUND);
+        }
+
+        ReservationMst reservationMst = reservationOpt.get();
+        reservationMst.setPaymentStatus(paymentStatus);
+        reservationMst.setStatus(paymentStatus.equals(STATUS_TRANSACTION_COMPLETE) ? STATUS_ACTIVE : STATUS_INACTIVE);
+        reservationMst.setUpdateOn(new Date());
+        reservationMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        reservationMstRepository.save(reservationMst);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
