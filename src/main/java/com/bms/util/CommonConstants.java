@@ -8,6 +8,8 @@ public abstract class CommonConstants {
     public static final char STATUS_INACTIVE = 'I';
     public static final char STATUS_DELETE = 'D';
     public static final char STATUS_PAID = 'P';
+    public static final char STATUS_PAYMENT_PENDING = 'P';
+    public static final char STATUS_PAYMENT_COMPLETE = 'C';
     public static final char STATUS_NOT_PAID = 'N';
     public static final char STATUS_PARTIALLY_PAID = 'H';
     public static final char STATUS_SENT = 'S';
@@ -56,9 +58,19 @@ public abstract class CommonConstants {
     public static final String PARAM_EMAIL_SEND_TO = "EMAIL_SEND_TO";
     public static final String PARAM_CONFIGURATION_URL = "CONFIGURATION_URL";
     public static final String PARAM_UUID = "UUID";
+    public static final String PARAM_ID = "PARAM_ID";
 
     // SQL Query Constants
     public static final String SQL_AND = "AND";
     public static final String SQL_OR = "OR";
     public static final String SQL_ORDER_BY = "ORDER BY";
+
+    // Payment Type
+    public static final Integer PAYMENT_TYPE_CARD = 1;
+    public static final Integer PAYMENT_TYPE_BANK = 2;
+
+    // Other
+    public static final String STRING_CURRENCY = "currency";
+    public static final String STRING_AMOUNT = "amount";
+    public static final String STRING_TRANSACTION_ID = "transactionId";
 }
