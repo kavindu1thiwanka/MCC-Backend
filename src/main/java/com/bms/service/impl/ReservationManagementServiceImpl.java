@@ -61,7 +61,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
 
         TransactionMst transactionMst = new TransactionMst();
         transactionMst.setReservationId(reservationMst.getId());
-        transactionMst.setAmount(reservationDto.getAmount());
+        transactionMst.setAmount(reservationDto.getTotalCost());
         transactionMst.setPaymentType(PAYMENT_TYPE_CARD);
         transactionMst.setPaymentDate(new Date());
         transactionMst.setStatus(STATUS_TRANSACTION_PENDING);

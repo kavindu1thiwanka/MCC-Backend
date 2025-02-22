@@ -1,6 +1,7 @@
 package com.bms.service.impl;
 
 import com.bms.dto.CommonFilterDto;
+import com.bms.dto.ReservationDto;
 import com.bms.dto.VehicleMstDto;
 import com.bms.entity.ReservationMst;
 import com.bms.repository.ReservationMstRepository;
@@ -12,10 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 @Transactional
@@ -85,6 +84,33 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Override
     public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto) {
         return null;
+    }
+
+    /**
+     * This method is used to calculate vehicle total cost
+     *
+     * @return total cost
+     */
+    @Override
+    public ResponseEntity<Object> getVehicleTotalCost(ReservationDto reservationDto) {
+
+        BigDecimal totalCost = BigDecimal.ZERO;
+
+        long reservedDays = (reservationDto.getReturnDate().getTime() - reservationDto.getPickUpDate().getTime())
+                / (1000 * 60 * 60 * 24);
+
+        reservedDays = reservedDays == 0 ? 1 : reservedDays;
+
+        totalCost = totalCost.add(BigDecimal.valueOf(reservedDays).multiply(reservationDto.getPricePerDay()));
+
+        if (Boolean.TRUE.equals(reservationDto.getNeedDriver())) {
+            totalCost = totalCost.add(BigDecimal.valueOf(reservedDays).multiply(BigDecimal.valueOf(1200)));
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCost", totalCost);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Autowired
