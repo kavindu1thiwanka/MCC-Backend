@@ -8,6 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Date;
 import java.util.List;
 
+import static com.bms.util.CommonConstants.STATUS_FAILED;
+import static com.bms.util.CommonConstants.STATUS_INACTIVE;
+
 public interface ReservationMstRepository extends JpaRepository<ReservationMst, Integer> {
 
     @Query("SELECT res.vehicleNo,res FROM ReservationMst res INNER JOIN VehicleMst veh ON res.vehicleNo = veh.vehicleNo " +
@@ -18,6 +21,7 @@ public interface ReservationMstRepository extends JpaRepository<ReservationMst, 
             "AND (:pickUpDate NOT BETWEEN res.pickUpDate AND res.returnDate) AND (:returnDate NOT BETWEEN res.pickUpDate AND res.returnDate)")
     List<Integer> getReservationUnavailableDrivers(Date pickUpDate, Date returnDate);
 
-    @Query("SELECT res FROM ReservationMst res WHERE res.createdBy = :username ORDER BY res.id DESC")
+    @Query("SELECT res FROM ReservationMst res WHERE res.createdBy = :username " +
+            "AND res.status NOT IN ('" + STATUS_FAILED + "' , '" + STATUS_INACTIVE + "') ORDER BY res.id DESC")
     List<ReservationMst> getReservationDetailsByCreatedUser(@Param("username") String username);
 }

@@ -103,7 +103,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
 
         ReservationMst reservationMst = reservationOpt.get();
         reservationMst.setPaymentStatus(paymentStatus);
-        reservationMst.setStatus(paymentStatus.equals(STATUS_TRANSACTION_COMPLETE) ? STATUS_ACTIVE : STATUS_INACTIVE);
+        reservationMst.setStatus(paymentStatus.equals(STATUS_TRANSACTION_COMPLETE) ? STATUS_ACTIVE : STATUS_FAILED);
         reservationMst.setUpdateOn(new Date());
         reservationMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
         reservationMstRepository.save(reservationMst);
