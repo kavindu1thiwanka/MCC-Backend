@@ -32,7 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         if (request.getRequestURI().startsWith("/auth/") || request.getRequestURI().equals("/user/v1/register")
-                || request.getRequestURI().equals("/user/v1/confirm") || request.getRequestURI().equals("/vehicle/v1/get_vehicle_list")) {
+                || request.getRequestURI().equals("/user/v1/confirm") || request.getRequestURI().equals("/vehicle/v1/get_vehicle_list")
+                || request.getRequestURI().equals("/vehicle/v1/get_vehicle_total_cost")) {
             chain.doFilter(request, response);
             return;
         }
