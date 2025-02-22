@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 
+import java.util.Map;
+
 import static com.bms.controller.abst.Mappings.*;
 
 @RestController
@@ -19,7 +21,7 @@ public class ReservationManagementController {
     private ReservationManagementService reservationManagementService;
 
     @PostMapping(CREATE_RESERVATION_V1)
-    public ResponseEntity<Object> createReservation(@RequestBody ReservationDto reservationDto) throws BMSCheckedException, StripeException {
+    public ResponseEntity<Map<String, String>> createReservation(@RequestBody ReservationDto reservationDto) throws BMSCheckedException, StripeException {
         return reservationManagementService.createReservation(reservationDto);
     }
 

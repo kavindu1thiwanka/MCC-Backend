@@ -49,7 +49,7 @@ public class StripeServiceImpl implements StripeService {
                                                 .setUnitAmount(amount * 100)
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Cab Service Booking [Transaction ID] :" + trxId )
+                                                                .setName("Cab Service Booking" )
                                                                 .build()
                                                 )
                                                 .build()

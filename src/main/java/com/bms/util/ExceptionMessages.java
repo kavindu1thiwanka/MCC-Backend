@@ -30,6 +30,7 @@ public abstract class ExceptionMessages {
     public static final String PICK_UP_DATE_CANNOT_BE_EMPTY = "Pick up date cannot be empty";
     public static final String RETURN_DATE_CANNOT_BE_EMPTY = "Return date cannot be empty";
     public static final String PICK_UP_LOCATION_CANNOT_BE_EMPTY = "Pick up location cannot be empty";
+    public static final String DRIVERS_NOT_AVAILABLE = "No drivers available at the moment";
 
     // Email Related Exceptions
     public static final String EMAIL_TEMPLATE_NOT_FOUND = "Email template not found";

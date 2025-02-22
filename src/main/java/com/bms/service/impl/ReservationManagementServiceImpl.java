@@ -18,10 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
@@ -43,7 +40,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * @return 201 HttpStatus if successfully created
      */
     @Override
-    public ResponseEntity<Object> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException {
+    public ResponseEntity<Map<String, String>> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException {
 
         validateTransaction(reservationDto);
 
@@ -70,11 +67,11 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         transactionMstRepository.save(transactionMst);
 
         HashMap<String, Object> map = new HashMap<>();
-        map.put(STRING_CURRENCY, "USD");
+        map.put(STRING_CURRENCY, "LKR");
         map.put(STRING_AMOUNT, transactionMst.getAmount());
         map.put(STRING_TRANSACTION_ID, transactionMst.getId());
 
-        return new ResponseEntity<>(stripeService.createCheckoutSession(map), HttpStatus.OK);
+        return stripeService.createCheckoutSession(map);
     }
 
     /**
@@ -117,16 +114,23 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     /**
      * This method is used to set driver id
      */
-    private void setDriverId(ReservationMst reservationMst) {
+    private void setDriverId(ReservationMst reservationMst) throws BMSCheckedException {
         List<UserMst> allDrivers = userMstRepository.getAllAvailableDrivers();
 
         if (!allDrivers.isEmpty()) {
             reservationMst.setDriverId(allDrivers.getFirst().getId());
+            return;
         }
 
-        reservationMst.setDriverId(reservationMstRepository
+        Integer driverId = reservationMstRepository
                 .getReservationUnavailableDrivers(reservationMst.getPickUpDate(), reservationMst.getReturnDate())
-                .getFirst());
+                .getFirst();
+
+        if (driverId == null) {
+            throw new BMSCheckedException(DRIVERS_NOT_AVAILABLE);
+        }
+
+        reservationMst.setDriverId(driverId);
     }
 
     /**
