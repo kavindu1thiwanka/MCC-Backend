@@ -16,5 +16,6 @@ public class ReservationDto {
     private Date returnDate;
     private String pickUpLocation;
     private String returnLocation;
-    private BigDecimal amount;
+    private BigDecimal totalCost;
+    private BigDecimal pricePerDay;
 }
