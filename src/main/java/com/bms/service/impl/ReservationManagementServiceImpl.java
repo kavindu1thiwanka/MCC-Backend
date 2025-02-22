@@ -112,6 +112,15 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     }
 
     /**
+     * This method is used to get reservation details
+     */
+    @Override
+    public ResponseEntity<Object> getReservationDetails() {
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByCreatedUser(user.getUsername()), HttpStatus.OK);
+    }
+
+    /**
      * This method is used to set driver id
      */
     private void setDriverId(ReservationMst reservationMst) throws BMSCheckedException {

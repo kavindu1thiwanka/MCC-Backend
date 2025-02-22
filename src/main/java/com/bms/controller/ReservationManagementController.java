@@ -30,6 +30,11 @@ public class ReservationManagementController {
         return reservationManagementService.updateReservationDetails(trxId, paymentStatus);
     }
 
+    @GetMapping(GET_RESERVATION_DETAILS_V1)
+    public ResponseEntity<Object> getReservationDetails() throws BMSCheckedException {
+        return reservationManagementService.getReservationDetails();
+    }
+
     @Autowired
     public void setReservationManagementService(ReservationManagementService reservationManagementService) {
         this.reservationManagementService = reservationManagementService;

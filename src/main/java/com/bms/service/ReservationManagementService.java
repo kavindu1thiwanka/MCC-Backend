@@ -12,4 +12,6 @@ public interface ReservationManagementService {
     ResponseEntity<Map<String, String>> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException;
 
     ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException;
+
+    ResponseEntity<Object> getReservationDetails();
 }
