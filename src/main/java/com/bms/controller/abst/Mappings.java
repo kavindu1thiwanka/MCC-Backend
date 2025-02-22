@@ -47,6 +47,7 @@ public abstract class Mappings {
 
     // Vehicle Management Mappings
     public static final String GET_VEHICLE_LIST_V1 = VERSION_V1 + "/get_vehicle_list";
+    public static final String GET_VEHICLE_TOTAL_COST = VERSION_V1 + "/get_vehicle_total_cost";
 
     // Menu Management Mappings
     public static final String GET_MENU_LIST_V1 = VERSION_V1 + "/get_menu_list";
