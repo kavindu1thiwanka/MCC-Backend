@@ -17,6 +17,7 @@ public class JwtUtil {
 
     private final long accessTokenExpiration = 1000 * 60 * 30;
     private final long refreshTokenExpiration = 1000 * 60 * 60 * 24 * 7;
+    private final long pwdResetTokenExpiration = 1000 * 60 * 10;
 
     public String generateAccessToken(String username) {
         return generateToken(username, accessTokenExpiration);
@@ -56,5 +57,9 @@ public class JwtUtil {
                 .getBody()
                 .getExpiration();
         return expiration.before(new Date());
+    }
+
+    public String generatePasswordResetToken(String username) {
+        return generateToken(username, pwdResetTokenExpiration);
     }
 }

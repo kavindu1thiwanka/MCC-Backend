@@ -17,6 +17,7 @@ public abstract class Mappings {
     // Auth Mappings
     public static final String LOGIN_V1 = VERSION_V1 + "/login";
     public static final String REFRESH_V1 = VERSION_V1 + "/refresh";
+    public static final String SEND_PASSWORD_RESET_MAIL_V1 = VERSION_V1 + "/send_pws_reset";
 
     // User Management Mappings
     public static final String REGISTER_USER_V1 = VERSION_V1 + "/register";

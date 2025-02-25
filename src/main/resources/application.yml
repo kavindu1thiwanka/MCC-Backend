@@ -42,6 +42,7 @@ application:
   url:
     confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
     login: http://localhost:4201/#/login
+    pwd-reset: http://localhost:4201/#/reset-password?tkn=PWD_RESET_TOKEN
   cors-allow-origins: http://localhost:4201
   stripe:
     api:
@@ -96,6 +97,7 @@ application:
   url:
     confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
     login: http://localhost:4201/#/login
+    pwd-reset: http://localhost:4201/#/reset-password?tkn=PWD_RESET_TOKEN
   cors-allow-origins: http://localhost:4201
   stripe:
     api:
@@ -150,6 +152,7 @@ application:
   url:
     confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
     login: http://localhost:4201/#/login
+    pwd-reset: http://localhost:4201/#/reset-password?tkn=PWD_RESET_TOKEN
   cors-allow-origins: http://localhost:4201
   stripe:
     api:

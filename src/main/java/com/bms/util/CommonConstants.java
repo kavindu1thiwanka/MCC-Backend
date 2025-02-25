@@ -45,6 +45,7 @@ public abstract class CommonConstants {
     public static final String FROM_MAIL = "${spring.mail.from}";
     public static final String CONFIRM_USER_EMAIL_URL = "${application.url.confirm-email}";
     public static final String LOGIN_URL = "${application.url.login}";
+    public static final String PWD_RESET_URL = "${application.url.pwd-reset}";
 
     // Date Format
     public static final String US_DATE_FORMATS_STRING = "MM/dd/yyyy";
@@ -55,14 +56,17 @@ public abstract class CommonConstants {
     // Email Template
     public static final Integer EMAIL_TEMPLATE_CONFIGURE_USER = 1;
     public static final Integer EMAIL_TEMPLATE_REGISTRATION_SUCCESS = 2;
+    public static final Integer EMAIL_TEMPLATE_PWD_RESET = 3;
 
     // Params
     public static final String PARAM_EMAIL_SEND_TO = "EMAIL_SEND_TO";
     public static final String PARAM_CONFIGURATION_URL = "CONFIGURATION_URL";
+    public static final String PARAM_PASSWORD_RESET_URL = "PWD_RESET_URL";
     public static final String PARAM_LOGIN_URL = "LOGIN_URL";
     public static final String PARAM_UUID = "UUID";
     public static final String PARAM_ID = "PARAM_ID";
     public static final String PARAM_USERNAME = "USERNAME";
+    public static final String PARAM_PWD_RESET_TOKEN = "PWD_RESET_TOKEN";
 
     // SQL Query Constants
     public static final String SQL_AND = "AND";
