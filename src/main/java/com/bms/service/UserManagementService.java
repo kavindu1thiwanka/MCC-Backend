@@ -5,6 +5,8 @@ import com.bms.dto.UserDto;
 import com.bms.util.BMSCheckedException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
+
 public interface UserManagementService {
 
     ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException;
@@ -24,4 +26,6 @@ public interface UserManagementService {
     ResponseEntity<Object> getUserAddress();
 
     ResponseEntity<Object> updateUserAddress(AddressDto address);
+
+    ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BMSCheckedException;
 }

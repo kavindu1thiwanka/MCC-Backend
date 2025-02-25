@@ -18,6 +18,8 @@ public abstract class ExceptionMessages {
     public static final String INVALID_PASSWORD = "Invalid password";
     public static final String IDENTIFIER_NOT_FOUND = "Identifier not found";
     public static final String INVALID_IDENTIFIER = "Invalid identifier";
+    public static final String NEW_PASSWORD_SAME_AS_OLD_PASSWORD = "New password cannot be same as old password.";
+    public static final String NEW_PASSWORD_CANNOT_BE_EMPTY = "New password cannot be empty.";
 
     // Role Related Exceptions
     public static final String ROLE_ID_CANNOT_BE_EMPTY = "Role id cannot be empty";

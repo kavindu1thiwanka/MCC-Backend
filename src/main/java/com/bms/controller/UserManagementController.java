@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import static com.bms.controller.abst.Mappings.*;
 
 @RestController
@@ -59,6 +61,11 @@ public class UserManagementController {
     @PutMapping(UPDATE_USER_ADDRESS_V1)
     public ResponseEntity<Object> updateUserAddress(@RequestBody AddressDto address) throws BMSCheckedException {
         return userManagementService.updateUserAddress(address);
+    }
+
+    @PostMapping(RESET_PASSWORD_V1)
+    public ResponseEntity<Object> resetPassword(@RequestBody Map<String, Object> requestBody) throws BMSCheckedException {
+        return userManagementService.resetPassword(requestBody);
     }
 
     @Autowired

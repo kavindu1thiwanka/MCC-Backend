@@ -43,12 +43,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     private CommonEmailMstRepository commonEmailMstRepository;
     private CommonEmailTemplateRepository commonEmailTemplateRepository;
     private AddressMstRepository addressMstRepository;
-    private JwtUtil jwtUtil;
 
     @Value(CONFIRM_USER_EMAIL_URL)
     private String confirmUserEmailUrl;
     @Value(LOGIN_URL)
     private String loginUrl;
+    private JwtUtil jwtUtil;
 
     /**
      * This method is used to register users (Customers & Drivers)
