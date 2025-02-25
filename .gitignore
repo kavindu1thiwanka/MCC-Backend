@@ -33,3 +33,7 @@ build/
 .vscode/
 
 gcs-key.json
+
+# Ignore files ending with ~
+*~
+
