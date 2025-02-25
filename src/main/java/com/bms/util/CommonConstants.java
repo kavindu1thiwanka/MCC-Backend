@@ -44,6 +44,7 @@ public abstract class CommonConstants {
     public static final String MAX_RETRY_COUNT = "${spring.mail.retry-count}";
     public static final String FROM_MAIL = "${spring.mail.from}";
     public static final String CONFIRM_USER_EMAIL_URL = "${application.url.confirm-email}";
+    public static final String LOGIN_URL = "${application.url.login}";
 
     // Date Format
     public static final String US_DATE_FORMATS_STRING = "MM/dd/yyyy";
@@ -53,12 +54,15 @@ public abstract class CommonConstants {
 
     // Email Template
     public static final Integer EMAIL_TEMPLATE_CONFIGURE_USER = 1;
+    public static final Integer EMAIL_TEMPLATE_REGISTRATION_SUCCESS = 2;
 
     // Params
     public static final String PARAM_EMAIL_SEND_TO = "EMAIL_SEND_TO";
     public static final String PARAM_CONFIGURATION_URL = "CONFIGURATION_URL";
+    public static final String PARAM_LOGIN_URL = "LOGIN_URL";
     public static final String PARAM_UUID = "UUID";
     public static final String PARAM_ID = "PARAM_ID";
+    public static final String PARAM_USERNAME = "USERNAME";
 
     // SQL Query Constants
     public static final String SQL_AND = "AND";

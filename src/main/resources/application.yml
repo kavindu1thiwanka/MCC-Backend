@@ -41,6 +41,7 @@ spring:
 application:
   url:
     confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
+    login: http://localhost:4201/#/login
   cors-allow-origins: http://localhost:4201
   stripe:
     api:
@@ -94,6 +95,7 @@ spring:
 application:
   url:
     confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
+    login: http://localhost:4201/#/login
   cors-allow-origins: http://localhost:4201
   stripe:
     api:
@@ -147,6 +149,7 @@ spring:
 application:
   url:
     confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
+    login: http://localhost:4201/#/login
   cors-allow-origins: http://localhost:4201
   stripe:
     api:

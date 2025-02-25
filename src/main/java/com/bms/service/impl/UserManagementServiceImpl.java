@@ -48,6 +48,8 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
     @Value(CONFIRM_USER_EMAIL_URL)
     private String confirmUserEmailUrl;
+    @Value(LOGIN_URL)
+    private String loginUrl;
 
     /**
      * This method is used to register users (Customers & Drivers)
@@ -97,15 +99,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         Element configurationUrlElement = html.body().getElementById(PARAM_CONFIGURATION_URL);
         configurationUrlElement.attr(HREF_ATTR, confirmUserEmailUrl.replace(PARAM_UUID, userMst.getUuid()));
 
-        CommonEmailMst commonEmailMst = new CommonEmailMst();
-        commonEmailMst.setSendTo(userMst.getEmail());
-        commonEmailMst.setSubject(emailTemplate.getSubject());
-        commonEmailMst.setContent(html.html());
-        commonEmailMst.setStatus(STATUS_UNSENT);
-
-        commonEmailMst.setCreatedOn(new Date());
-        commonEmailMst.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
-
+        CommonEmailMst commonEmailMst = new CommonEmailMst(userMst.getEmail(), emailTemplate.getSubject(), html.html());
         commonEmailMstRepository.save(commonEmailMst);
     }
 
@@ -223,13 +217,42 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         UserMst user = userOpt.get();
 
         if (user.getStatus().equals(STATUS_ACTIVE)) {
-            throw new BMSCheckedException(USER_ALREADY_EXISTS);
+            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
         }
 
         user.setStatus(STATUS_ACTIVE);
         userMstRepository.save(user);
 
+        sendRegistrationSuccessEmail(user);
+
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to send registration success email
+     */
+    private void sendRegistrationSuccessEmail(UserMst user) throws BMSCheckedException {
+        Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_REGISTRATION_SUCCESS);
+
+        if (templateOpt.isEmpty()) {
+            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+        }
+
+        CommonEmailTemplate emailTemplate = templateOpt.get();
+
+        Document html = Jsoup.parse(emailTemplate.getTemplateData(), CHARACTER_TYPE);
+
+        Element emailSendToElement = html.body().getElementById(PARAM_EMAIL_SEND_TO);
+        emailSendToElement.html(user.getFirstName().concat(EMPTY_SPACE_STRING).concat(user.getLastName() == null ? EMPTY_STRING : user.getLastName()));
+
+        Element loginUrlElement = html.body().getElementById(PARAM_LOGIN_URL);
+        loginUrlElement.attr(HREF_ATTR, loginUrl);
+
+        Element usernameElement = html.body().getElementById(PARAM_USERNAME);
+        usernameElement.html(user.getUsername());
+
+        CommonEmailMst commonEmailMst = new CommonEmailMst(user.getEmail(), emailTemplate.getSubject(), html.html());
+        commonEmailMstRepository.save(commonEmailMst);
     }
 
     /**

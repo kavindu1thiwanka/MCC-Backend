@@ -7,8 +7,12 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.Serializable;
+import java.util.Date;
+
+import static com.bms.util.CommonConstants.STATUS_UNSENT;
 
 @Entity
 @Data
@@ -31,4 +35,13 @@ public class CommonEmailMst extends CommonBaseEntity implements Serializable {
 
     @Column(name = "status", nullable = false)
     private Character status;
+
+    public CommonEmailMst(String sendTo, String subject, String content) {
+        this.sendTo = sendTo;
+        this.subject = subject;
+        this.content = content;
+        this.status = STATUS_UNSENT;
+        this.createdOn = new Date();
+        this.createdBy = SecurityContextHolder.getContext().getAuthentication().getName();
+    }
 }
