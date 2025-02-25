@@ -46,6 +46,8 @@ public abstract class CommonConstants {
     public static final String CONFIRM_USER_EMAIL_URL = "${application.url.confirm-email}";
     public static final String LOGIN_URL = "${application.url.login}";
     public static final String PWD_RESET_URL = "${application.url.pwd-reset}";
+    public static final String GCP_PROJECT_ID = "${gcp.project-id}";
+    public static final String GCP_BUCKET = "${gcp.bucket-name}";
 
     // Date Format
     public static final String US_DATE_FORMATS_STRING = "MM/dd/yyyy";

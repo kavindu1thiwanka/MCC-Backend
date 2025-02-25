@@ -110,6 +110,14 @@
             <artifactId>stripe-java</artifactId>
             <version>28.3.1</version>
         </dependency>
+
+        <!-- Google Cloud -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+            <version>2.27.0</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>
