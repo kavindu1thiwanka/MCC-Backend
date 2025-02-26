@@ -329,7 +329,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
     /**
      * This method is used to retrieve logged-in user details
-     * 
+     *
      */
     @Override
     public ResponseEntity<Object> getLoggedInUserDetails() {
