@@ -123,7 +123,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         userMstRepository.save(existingUser);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(existingUser, HttpStatus.OK);
 
     }
 
