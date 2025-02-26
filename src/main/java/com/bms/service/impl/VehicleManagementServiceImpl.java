@@ -4,17 +4,27 @@ import com.bms.dto.CommonFilterDto;
 import com.bms.dto.ReservationDto;
 import com.bms.dto.VehicleMstDto;
 import com.bms.entity.ReservationMst;
+import com.bms.entity.VehicleMst;
 import com.bms.repository.ReservationMstRepository;
 import com.bms.repository.VehicleManagementCustomRepository;
+import com.bms.repository.VehicleMstRepository;
+import com.bms.service.FileStorageService;
 import com.bms.service.VehicleManagementService;
+import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
+
+import static com.bms.util.CommonConstants.STATUS_ACTIVE;
+import static com.bms.util.ExceptionMessages.*;
 
 @Service
 @Transactional
@@ -22,6 +32,8 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
 
     private VehicleManagementCustomRepository vehicleManagementCustomRepository;
     private ReservationMstRepository reservationMstRepository;
+    private VehicleMstRepository vehicleMstRepository;
+    private FileStorageService fileStorageService;
 
     /**
      * This method is used to get vehicle list based on filter
@@ -81,9 +93,66 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         return reservationMap;
     }
 
+    /**
+     * This method is used to add vehicle
+     */
     @Override
-    public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto) {
-        return null;
+    public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+
+        validateVehicleDetails(vehicleMstDto);
+
+        VehicleMst vehicleMst = new VehicleMst();
+        vehicleMst.setVehicleNo(vehicleMstDto.getVehicleNo());
+        vehicleMst.setVehicleModel(vehicleMstDto.getName());
+        vehicleMst.setVehicleType(vehicleMstDto.getVehicleType());
+        vehicleMst.setCategory(vehicleMstDto.getCategory());
+        vehicleMst.setSeats(vehicleMstDto.getSeats());
+        vehicleMst.setGearType(vehicleMstDto.getGearType());
+        vehicleMst.setPricePerDay(vehicleMstDto.getPricePerDay());
+        vehicleMst.setStatus(STATUS_ACTIVE);
+
+        if (vehicleImage != null) {
+            vehicleMst.setVehicleImage(fileStorageService.uploadVehicleImage(vehicleImage, vehicleMstDto.getVehicleNo()));
+        }
+
+        vehicleMst.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        vehicleMst.setCreatedOn(new Date());
+        vehicleMstRepository.save(vehicleMst);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    private void validateVehicleDetails(VehicleMstDto vehicleMstDto) throws BMSCheckedException {
+
+        if (vehicleMstDto == null) {
+            throw new BMSCheckedException(VEHICLE_DETAILS_CANNOT_BE_NULL);
+        }
+
+        if (vehicleMstDto.getVehicleNo() == null || vehicleMstDto.getVehicleNo().isEmpty()) {
+            throw new BMSCheckedException(VEHICLE_NO_CANNOT_BE_EMPTY);
+        } else if (vehicleMstRepository.existsByVehicleNo(vehicleMstDto.getVehicleNo())) {
+            throw new BMSCheckedException(VEHICLE_ALREADY_EXISTS);
+        }
+
+        if (vehicleMstDto.getName() == null || vehicleMstDto.getName().isEmpty()) {
+            throw new BMSCheckedException(VEHICLE_NAME_CANNOT_BE_EMPTY);
+        }
+
+        if (vehicleMstDto.getVehicleType() == null || vehicleMstDto.getVehicleType().isEmpty()) {
+            throw new BMSCheckedException(VEHICLE_TYPE_CANNOT_BE_EMPTY);
+        }
+
+        if (vehicleMstDto.getSeats() == null) {
+            throw new BMSCheckedException(SEATS_AMOUNT_CANNOT_BE_NULL);
+        }
+
+        if (vehicleMstDto.getGearType() == null || vehicleMstDto.getGearType().isEmpty()) {
+            throw new BMSCheckedException(GEAR_TYPE_CANNOT_BE_EMPTY);
+        }
+
+        if (vehicleMstDto.getPricePerDay() == null) {
+            throw new BMSCheckedException(PRICE_PER_DAY_CANNOT_BE_NULL);
+        }
     }
 
     /**
@@ -121,5 +190,15 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Autowired
     public void setReservationMstRepository(ReservationMstRepository reservationMstRepository) {
         this.reservationMstRepository = reservationMstRepository;
+    }
+
+    @Autowired
+    public void setVehicleMstRepository(VehicleMstRepository vehicleMstRepository) {
+        this.vehicleMstRepository = vehicleMstRepository;
+    }
+
+    @Autowired
+    public void setFileStorageService(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 }

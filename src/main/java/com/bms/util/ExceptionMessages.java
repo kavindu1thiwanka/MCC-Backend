@@ -27,7 +27,6 @@ public abstract class ExceptionMessages {
     public static final String ROLE_NOT_FOUND = "Role not found";
 
     // Reservation Related Exceptions
-    public static final String VEHICLE_NO_CANNOT_BE_EMPTY = "Vehicle no cannot be empty";
     public static final String DRIVER_ID_CANNOT_BE_EMPTY = "Driver id cannot be empty";
     public static final String PICK_UP_DATE_CANNOT_BE_EMPTY = "Pick up date cannot be empty";
     public static final String RETURN_DATE_CANNOT_BE_EMPTY = "Return date cannot be empty";
@@ -40,5 +39,15 @@ public abstract class ExceptionMessages {
     // Reservation & Payment Related Exceptions
     public static final String RESERVATION_NOT_FOUND = "Reservation not found";
     public static final String TRANSACTION_NOT_FOUND = "Transaction not found";
+
+    // Vehicle Related Exceptions
+    public static final String VEHICLE_ALREADY_EXISTS = "Vehicle already exists";
+    public static final String VEHICLE_NO_CANNOT_BE_EMPTY = "Vehicle number cannot be empty";
+    public static final String VEHICLE_DETAILS_CANNOT_BE_NULL = "Vehicle details cannot be null";
+    public static final String VEHICLE_NAME_CANNOT_BE_EMPTY = "Vehicle name cannot be empty";
+    public static final String VEHICLE_TYPE_CANNOT_BE_EMPTY = "Vehicle type cannot be empty";
+    public static final String SEATS_AMOUNT_CANNOT_BE_NULL = "Seats amount cannot be null";
+    public static final String GEAR_TYPE_CANNOT_BE_EMPTY = "Gear type cannot be empty";
+    public static final String PRICE_PER_DAY_CANNOT_BE_NULL = "Price per day cannot be null";
 
 }

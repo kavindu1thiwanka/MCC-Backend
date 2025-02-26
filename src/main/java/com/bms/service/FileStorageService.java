@@ -8,5 +8,7 @@ public interface FileStorageService {
 
     String uploadFile(MultipartFile file) throws IOException;
 
+    String uploadVehicleImage(MultipartFile file, String vehicleNo) throws IOException;
+
     String uploadFile(MultipartFile file, String folderName) throws IOException;
 }

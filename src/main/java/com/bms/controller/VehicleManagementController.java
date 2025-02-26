@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.bms.controller.abst.Mappings.*;
 
@@ -31,8 +32,8 @@ public class VehicleManagementController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto) {
-        return vehicleManagementService.addVehicle(vehicleMstDto);
+    public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException {
+        return vehicleManagementService.addVehicle(vehicleMstDto, vehicleImage);
     }
 
     @Autowired

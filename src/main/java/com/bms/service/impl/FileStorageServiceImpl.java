@@ -20,6 +20,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Value(GCP_BUCKET)
     private String bucketName;
 
+    private static final String cloudStorageUrl = "https://storage.googleapis.com/%s/%s";
+
     public FileStorageServiceImpl(Storage storage) {
         this.storage = storage;
     }
@@ -38,14 +40,34 @@ public class FileStorageServiceImpl implements FileStorageService {
                 .build();
 
         storage.create(blobInfo, file.getBytes());
-        return String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
+        return String.format(cloudStorageUrl, bucketName, fileName);
+    }
+
+    /**
+     * This method is used to upload file to Google Cloud Storage
+     *
+     * @param file vehicle image
+     * @param vehicleNo vehicle number
+     */
+    @Override
+    public String uploadVehicleImage(MultipartFile file, String vehicleNo) throws IOException {
+
+        String fileName = vehicleNo + "-" + file.getOriginalFilename();
+        String path = "mcc/vehicles/" + fileName;
+
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, path)
+                .setContentType(file.getContentType())
+                .build();
+
+        storage.create(blobInfo, file.getBytes());
+        return String.format(cloudStorageUrl, bucketName, path);
     }
 
     /**
      * This method is used to upload file to Google Cloud Storage
      * for a specific folder
      *
-     * @param file File to be uploaded
+     * @param file       File to be uploaded
      * @param folderName Folder name
      * @return File URL
      */
@@ -61,6 +83,6 @@ public class FileStorageServiceImpl implements FileStorageService {
                 .build();
 
         storage.create(blobInfo, file.getBytes());
-        return String.format("https://storage.googleapis.com/%s/%s", bucketName, objectName);
+        return String.format(cloudStorageUrl, bucketName, objectName);
     }
 }

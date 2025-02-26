@@ -16,6 +16,6 @@ public class VehicleMstDto {
     private String vehicleType;
     private Integer seats;
     private String gearType;
-    private String vehicleImage;
+    private String category;
     private BigDecimal pricePerDay;
 }
