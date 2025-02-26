@@ -117,7 +117,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         UserMst existingUser = getExistingUser(userDetails.getId());
         existingUser.updateUserDetails(userDetails);
-        existingUser.setPassword(userDetails.getPassword() == null
+        existingUser.setPassword((userDetails.getPassword() == null || userDetails.getPassword().isEmpty())
                 ? existingUser.getPassword() : passwordEncoder.encode(userDetails.getPassword()));
         setUsersUpdatedMetaData(existingUser);
 
@@ -342,7 +342,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
             throw new RuntimeException(USER_NOT_FOUND);
         }
 
-        return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
+        UserMst userMst = userOpt.get();
+        userMst.setPassword(null);
+
+        return new ResponseEntity<>(userMst, HttpStatus.OK);
     }
 
     /**
