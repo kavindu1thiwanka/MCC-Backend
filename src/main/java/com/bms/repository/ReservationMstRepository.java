@@ -14,7 +14,7 @@ import static com.bms.util.CommonConstants.STATUS_INACTIVE;
 public interface ReservationMstRepository extends JpaRepository<ReservationMst, Integer> {
 
     @Query("SELECT res.vehicleNo,res FROM ReservationMst res INNER JOIN VehicleMst veh ON res.vehicleNo = veh.vehicleNo " +
-            "WHERE res.status = 'A' AND veh.category = :category AND veh.status='A' AND veh.availability='Y'")
+            "WHERE res.status = 'A' AND veh.category = :category AND veh.status='A'")
     List<Object[]> getAlreadyBookedVehicles(@Param("category") String category);
 
     @Query("SELECT res.driverId FROM ReservationMst res WHERE res.status = 'A' " +
