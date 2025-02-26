@@ -28,4 +28,6 @@ public interface UserManagementService {
     ResponseEntity<Object> updateUserAddress(AddressDto address);
 
     ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BMSCheckedException;
+
+    ResponseEntity<Object> getLoggedInUserDetails();
 }

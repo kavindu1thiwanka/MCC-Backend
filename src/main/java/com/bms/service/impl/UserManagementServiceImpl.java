@@ -256,7 +256,6 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
     /**
      * This method is used to get user address
-     *
      */
     @Override
     public ResponseEntity<Object> getUserAddress() {
@@ -326,6 +325,24 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         userMstRepository.save(user);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve logged-in user details
+     * 
+     */
+    @Override
+    public ResponseEntity<Object> getLoggedInUserDetails() {
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<UserMst> userOpt = userMstRepository.findById(user.getId());
+
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException(USER_NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
     }
 
     /**

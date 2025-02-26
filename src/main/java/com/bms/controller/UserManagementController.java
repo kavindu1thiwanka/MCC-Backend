@@ -68,6 +68,11 @@ public class UserManagementController {
         return userManagementService.resetPassword(requestBody);
     }
 
+    @GetMapping(GET_LOGGED_IN_USER_DETAILS_V1)
+    public ResponseEntity<Object> getLoggedInUserDetails() {
+        return userManagementService.getLoggedInUserDetails();
+    }
+
     @Autowired
     public void setUserManagementService(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;
