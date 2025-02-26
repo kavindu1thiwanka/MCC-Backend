@@ -343,7 +343,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         }
 
         UserMst userMst = userOpt.get();
-        userMst.setPassword(null);
+        userMst.setPassword(EMPTY_STRING);
 
         return new ResponseEntity<>(userMst, HttpStatus.OK);
     }
