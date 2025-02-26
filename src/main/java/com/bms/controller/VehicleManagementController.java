@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 import static com.bms.controller.abst.Mappings.*;
 
 @RestController
@@ -32,7 +34,7 @@ public class VehicleManagementController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException {
+    public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
         return vehicleManagementService.addVehicle(vehicleMstDto, vehicleImage);
     }
 
