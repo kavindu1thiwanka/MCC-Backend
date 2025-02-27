@@ -63,10 +63,6 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         UserMst userMst = new UserMst(user);
 
-        if (userMst.getRoleId().equals(ROLE_ID_DRIVER) && (userMst.getDriverLicenseNo() == null || userMst.getDriverLicenseNo().isEmpty())) {
-            throw new BMSCheckedException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
-        }
-
         userMst.setPassword(passwordEncoder.encode(user.getPassword()));
         userMstRepository.save(userMst);
 
