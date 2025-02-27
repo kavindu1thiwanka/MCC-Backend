@@ -342,10 +342,9 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
             throw new RuntimeException(USER_NOT_FOUND);
         }
 
-        UserMst userMst = userOpt.get();
-        userMst.setPassword(EMPTY_STRING);
+        UserDto userDto = new UserDto(userOpt.get());
 
-        return new ResponseEntity<>(userMst, HttpStatus.OK);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
     /**
