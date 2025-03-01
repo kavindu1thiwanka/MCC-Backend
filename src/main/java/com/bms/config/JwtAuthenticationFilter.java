@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.bms.util.CommonConstants.*;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -71,7 +73,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
 
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
-                    null, grantAuthorityCodes(authCodes)));
+                    null, grantAuthorityCodes(authCodes, user.getRoleId())));
 
         } else {
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
@@ -92,11 +94,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * This method is used to generate a list of GrantedAuthority objects from
      * the auth codes that the user has.
      */
-    private Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes) {
+    private Set<GrantedAuthority> grantAuthorityCodes(Set<String> authCodes, Integer roleId) {
         Set<GrantedAuthority> authorityList = new HashSet<>();
         authCodes.forEach((authority) -> {
             authorityList.add(new SimpleGrantedAuthority(authority));
         });
+
+        if (roleId.equals(ROLE_ID_ADMIN)) {
+            authorityList.add(new SimpleGrantedAuthority(ROLE_ADMIN_WITH_ROLE_PREFIX));
+        }
+
+        if (roleId.equals(ROLE_ID_CUSTOMER)) {
+            authorityList.add(new SimpleGrantedAuthority(ROLE_CUSTOMER_WITH_ROLE_PREFIX));
+        }
+
+        if (roleId.equals(ROLE_ID_DRIVER)) {
+            authorityList.add(new SimpleGrantedAuthority(ROLE_DRIVER_WITH_ROLE_PREFIX));
+        }
+
         return authorityList;
     }
 

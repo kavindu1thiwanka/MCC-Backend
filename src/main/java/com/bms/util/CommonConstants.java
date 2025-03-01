@@ -32,9 +32,13 @@ public abstract class CommonConstants {
     public static final int ROLE_ID_CUSTOMER = 2;
     public static final int ROLE_ID_DRIVER = 3;
 
-    public static final String ROLE_ADMIN = "RL_ADMIN";
-    public static final String ROLE_CUSTOMER = "RL_CUSTOMER";
-    public static final String ROLE_DRIVER = "RL_DRIVER";
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_CUSTOMER = "CUSTOMER";
+    public static final String ROLE_DRIVER = "DRIVER";
+
+    public static final String ROLE_ADMIN_WITH_ROLE_PREFIX = "ROLE_ADMIN";
+    public static final String ROLE_CUSTOMER_WITH_ROLE_PREFIX = "ROLE_CUSTOMER";
+    public static final String ROLE_DRIVER_WITH_ROLE_PREFIX = "ROLE_DRIVER";
 
     public static final String IDENTIFIER_ROLE_ADMIN = "LTWRHaJVNMKk";
     public static final String IDENTIFIER_ROLE_CUSTOMER = "mGwDgRbpBKyf";

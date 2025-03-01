@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -421,21 +422,21 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         String role = "";
 
         if (user.getRoleId().equals(ROLE_ID_ADMIN)) {
-            role = ROLE_ADMIN;
+            role = ROLE_ADMIN_WITH_ROLE_PREFIX;
         }
 
         if (user.getRoleId().equals(ROLE_ID_CUSTOMER)) {
-            role = ROLE_CUSTOMER;
+            role = ROLE_CUSTOMER_WITH_ROLE_PREFIX;
         }
 
         if (user.getRoleId().equals(ROLE_ID_DRIVER)) {
-            role = ROLE_DRIVER;
+            role = ROLE_DRIVER_WITH_ROLE_PREFIX;
         }
 
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(role)
+                .authorities(role)
                 .build();
     }
 
