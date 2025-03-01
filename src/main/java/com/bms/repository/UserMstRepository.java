@@ -24,8 +24,8 @@ public interface UserMstRepository extends JpaRepository<UserMst, Integer> {
     @Query("SELECT mst FROM UserMst mst WHERE mst.uuid = :uuid")
     Optional<UserMst> findUserByUuid(@Param("uuid") String uuid);
 
-    @Query("SELECT mst FROM UserMst mst WHERE mst.roleId = " + ROLE_ID_DRIVER +" AND mst.status = '" + STATUS_ACTIVE + "' " +
-            "AND mst.id NOT IN (SELECT res.driverId FROM ReservationMst res WHERE res.status = 'A')")
+    @Query("SELECT mst FROM UserMst mst WHERE mst.roleId = " + ROLE_ID_DRIVER + " AND mst.status = '" + STATUS_ACTIVE + "' " +
+            "AND mst.isOnline = '" + STATUS_YES + "' AND mst.id NOT IN (SELECT res.driverId FROM ReservationMst res WHERE res.status = 'A')")
     List<UserMst> getAllAvailableDrivers();
 
     @Query("SELECT mst.isOnline FROM UserMst mst WHERE mst.id = :driverId")

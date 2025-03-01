@@ -8,16 +8,16 @@ import org.springframework.data.repository.query.Param;
 import java.util.Date;
 import java.util.List;
 
-import static com.bms.util.CommonConstants.STATUS_FAILED;
-import static com.bms.util.CommonConstants.STATUS_INACTIVE;
+import static com.bms.util.CommonConstants.*;
 
 public interface ReservationMstRepository extends JpaRepository<ReservationMst, Integer> {
 
     @Query("SELECT res.vehicleNo,res FROM ReservationMst res INNER JOIN VehicleMst veh ON res.vehicleNo = veh.vehicleNo " +
-            "WHERE res.status = 'A' AND veh.category = :category AND veh.status='A'")
+            "WHERE res.status = '" + STATUS_ACTIVE + "' AND veh.category = :category AND veh.status='" + STATUS_ACTIVE + "'")
     List<Object[]> getAlreadyBookedVehicles(@Param("category") String category);
 
-    @Query("SELECT res.driverId FROM ReservationMst res WHERE res.status = 'A' " +
+    @Query("SELECT res.driverId FROM ReservationMst res INNER JOIN UserMst usr ON res.driverId = usr.id " +
+            "WHERE res.status = '" + STATUS_ACTIVE + "' AND usr.status = '" + STATUS_ACTIVE + "' AND usr.isOnline= '" + STATUS_YES + "'" +
             "AND (:pickUpDate NOT BETWEEN res.pickUpDate AND res.returnDate) AND (:returnDate NOT BETWEEN res.pickUpDate AND res.returnDate)")
     List<Integer> getReservationUnavailableDrivers(Date pickUpDate, Date returnDate);
 
@@ -25,7 +25,7 @@ public interface ReservationMstRepository extends JpaRepository<ReservationMst, 
             "AND res.status NOT IN ('" + STATUS_FAILED + "' , '" + STATUS_INACTIVE + "') ORDER BY res.id DESC")
     List<ReservationMst> getReservationDetailsByCreatedUser(@Param("username") String username);
 
-    @Query("SELECT res FROM ReservationMst res WHERE res.driverId = :id AND res.status = 'A' " +
+    @Query("SELECT res FROM ReservationMst res WHERE res.driverId = :id AND res.status = '" + STATUS_ACTIVE + "' " +
             "AND res.pickUpDate >= :date ORDER BY res.pickUpDate ASC")
     List<ReservationMst> getUpcomingReservationsByDriverId(Date date, Integer id);
 }
