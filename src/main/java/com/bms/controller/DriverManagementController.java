@@ -22,8 +22,8 @@ public class DriverManagementController {
     }
 
     @GetMapping(GET_ONLINE_STATUS_V1)
-    public ResponseEntity<Object> getOnlineStatus() throws BMSCheckedException {
-        return driverManagementService.getOnlineStatus();
+    public ResponseEntity<Object> getDriverDashboardDetails() throws BMSCheckedException {
+        return driverManagementService.getDriverDashboardDetails();
     }
 
     @Autowired

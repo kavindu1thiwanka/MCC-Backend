@@ -9,7 +9,7 @@ public abstract class CommonConstants {
     public static final char STATUS_DELETE = 'D';
     public static final char STATUS_PAID = 'P';
     public static final char STATUS_TRANSACTION_PENDING = 'P';
-    public static final char STATUS_TRANSACTION_COMPLETE = 'C';
+    public static final char STATUS_COMPLETE = 'C';
     public static final char STATUS_NOT_PAID = 'N';
     public static final char STATUS_PARTIALLY_PAID = 'H';
     public static final char STATUS_SENT = 'S';

@@ -27,4 +27,7 @@ public interface UserMstRepository extends JpaRepository<UserMst, Integer> {
     @Query("SELECT mst FROM UserMst mst WHERE mst.roleId = " + ROLE_ID_DRIVER +" AND mst.status = '" + STATUS_ACTIVE + "' " +
             "AND mst.id NOT IN (SELECT res.driverId FROM ReservationMst res WHERE res.status = 'A')")
     List<UserMst> getAllAvailableDrivers();
+
+    @Query("SELECT mst.isOnline FROM UserMst mst WHERE mst.id = :driverId")
+    Character getDriverOnlineStatus(@Param("driverId") Integer driverId);
 }

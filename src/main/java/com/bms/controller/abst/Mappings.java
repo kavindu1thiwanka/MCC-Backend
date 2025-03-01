@@ -66,5 +66,5 @@ public abstract class Mappings {
 
     // Driver Management Mappings
     public static final String UPDATE_ONLINE_STATUS_V1 = VERSION_V1 + "/update_online_status";
-    public static final String GET_ONLINE_STATUS_V1 = VERSION_V1 + "/get_online_status";
+    public static final String GET_ONLINE_STATUS_V1 = VERSION_V1 + "/get_dashboard_details";
 }
