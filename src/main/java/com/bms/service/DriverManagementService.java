@@ -8,4 +8,6 @@ public interface DriverManagementService {
     ResponseEntity<Object> updateOnlineStatus(Boolean isOnline) throws BMSCheckedException;
 
     ResponseEntity<Object> getDriverDashboardDetails();
+
+    ResponseEntity<Object> getDriverRideHistory();
 }

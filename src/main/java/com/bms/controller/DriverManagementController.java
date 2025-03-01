@@ -26,6 +26,11 @@ public class DriverManagementController {
         return driverManagementService.getDriverDashboardDetails();
     }
 
+    @GetMapping(GET_RIDES_HISTORY_V1)
+    public ResponseEntity<Object> getDriverRideHistory() throws BMSCheckedException {
+        return driverManagementService.getDriverRideHistory();
+    }
+
     @Autowired
     public void setDriverManagementService(DriverManagementService driverManagementService) {
         this.driverManagementService = driverManagementService;

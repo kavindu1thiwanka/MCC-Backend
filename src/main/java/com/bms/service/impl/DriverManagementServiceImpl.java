@@ -96,6 +96,12 @@ public class DriverManagementServiceImpl implements DriverManagementService {
         return new ResponseEntity<>(responseObj, HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Object> getDriverRideHistory() {
+        UserMst driver = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new ResponseEntity<>(reservationMstRepository.getRideHistory(new Date(), driver.getId()), HttpStatus.OK);
+    }
+
     /**
      * Helper method to check if two dates are in the same day
      */

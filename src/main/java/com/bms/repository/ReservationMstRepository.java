@@ -25,7 +25,11 @@ public interface ReservationMstRepository extends JpaRepository<ReservationMst, 
             "AND res.status NOT IN ('" + STATUS_FAILED + "' , '" + STATUS_INACTIVE + "') ORDER BY res.id DESC")
     List<ReservationMst> getReservationDetailsByCreatedUser(@Param("username") String username);
 
-    @Query("SELECT res FROM ReservationMst res WHERE res.driverId = :id AND res.status = '" + STATUS_ACTIVE + "' " +
+    @Query("SELECT res FROM ReservationMst res WHERE res.driverId = :driverId AND res.status = '" + STATUS_ACTIVE + "' " +
             "AND res.pickUpDate >= :date ORDER BY res.pickUpDate ASC")
-    List<ReservationMst> getUpcomingReservationsByDriverId(Date date, Integer id);
+    List<ReservationMst> getUpcomingReservationsByDriverId(@Param("date") Date date, @Param("driverId") Integer driverId);
+
+    @Query("SELECT res FROM ReservationMst res WHERE res.driverId = :driverId AND res.status NOT IN ('" + STATUS_FAILED + "' , '" + STATUS_INACTIVE + "') " +
+            "AND res.returnDate < :date ORDER BY res.returnDate DESC")
+    List<ReservationMst> getRideHistory(@Param("date") Date date, @Param("driverId") Integer driverId);
 }
