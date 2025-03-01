@@ -15,6 +15,8 @@ public abstract class CommonConstants {
     public static final char STATUS_SENT = 'S';
     public static final char STATUS_UNSENT = 'U';
     public static final char STATUS_FAILED = 'F';
+    public static final char STATUS_YES = 'Y';
+    public static final char STATUS_NO = 'N';
 
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_SPACE_STRING = " ";

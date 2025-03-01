@@ -46,6 +46,9 @@ public class UserMst extends CommonBaseEntity implements Serializable {
     @Column(name = "driver_license_no")
     private String driverLicenseNo;
 
+    @Column(name = "is_online")
+    private Character isOnline;
+
     @Column(name = "status", nullable = false)
     private Character status;
 
@@ -66,6 +69,10 @@ public class UserMst extends CommonBaseEntity implements Serializable {
             case IDENTIFIER_ROLE_DRIVER:
                 this.roleId = ROLE_ID_DRIVER;
                 break;
+        }
+
+        if (this.roleId == ROLE_ID_DRIVER) {
+            this.isOnline = STATUS_NO;
         }
     }
 

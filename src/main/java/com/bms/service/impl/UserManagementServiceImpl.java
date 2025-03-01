@@ -373,10 +373,25 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     private void validateUserCreate(UserDto user) throws BMSCheckedException {
 
+        if (user.getIdentifier() == null) {
+            throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
+        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER).contains(user.getIdentifier())) {
+            throw new BMSCheckedException(INVALID_IDENTIFIER);
+        }
+
+        switch (user.getIdentifier()) {
+            case IDENTIFIER_ROLE_CUSTOMER:
+                user.setId(ROLE_ID_CUSTOMER);
+                break;
+            case IDENTIFIER_ROLE_DRIVER:
+                user.setId(ROLE_ID_DRIVER);
+                break;
+        }
+
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new BMSCheckedException(USER_EMAIL_CANNOT_BE_EMPTY);
         } else {
-            userMstRepository.findByEmailAndStatusNot(user.getEmail(), STATUS_DELETE).ifPresent(userMst -> {
+            userMstRepository.findByEmailAndRoleIdAndStatusNot(user.getEmail(), user.getRoleId(), STATUS_DELETE).ifPresent(userMst -> {
                 throw new RuntimeException(USER_ALREADY_EXISTS);
             });
         }
@@ -395,12 +410,6 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             throw new BMSCheckedException(USER_PASSWORD_CANNOT_BE_EMPTY);
-        }
-
-        if (user.getIdentifier() == null) {
-            throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
-        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER).contains(user.getIdentifier())) {
-            throw new BMSCheckedException(INVALID_IDENTIFIER);
         }
     }
 

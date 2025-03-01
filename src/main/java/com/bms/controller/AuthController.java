@@ -6,11 +6,13 @@ import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
 
 import static com.bms.controller.abst.Mappings.*;
 
 @RestController
 @RequestMapping(AUTH)
+@RequestScope
 public class AuthController {
 
     private AuthService authService;

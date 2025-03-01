@@ -7,6 +7,7 @@ import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import static com.bms.controller.abst.Mappings.*;
 
 @RestController
 @RequestMapping(USER)
+@RequestScope
 public class UserManagementController {
 
     private UserManagementService userManagementService;
