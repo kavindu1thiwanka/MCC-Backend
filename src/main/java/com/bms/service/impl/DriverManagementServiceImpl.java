@@ -53,7 +53,7 @@ public class DriverManagementServiceImpl implements DriverManagementService {
         UserMst driver = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         HashMap<String, Object> responseObj = new HashMap<>();
 
-        responseObj.put("isOnline", userMstRepository.getDriverOnlineStatus(driver.getId()).equals(STATUS_YES) );
+        responseObj.put("isOnline", userMstRepository.getDriverOnlineStatus(driver.getId()).equals(STATUS_YES));
 
         List<TransactionMst> transactionList = transactionMstRepository.getDriverEarningsByDriverId(driver.getId());
 
