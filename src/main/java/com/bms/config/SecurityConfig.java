@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/vehicle/v1/get_vehicle_list").permitAll()
                         .requestMatchers("/vehicle/v1/get_vehicle_total_cost").permitAll()
                         .requestMatchers("/driver/**").hasRole(ROLE_DRIVER)
+                        .requestMatchers("/res/v1/update_reservation_status").hasAnyRole(ROLE_CUSTOMER, ROLE_ADMIN)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
