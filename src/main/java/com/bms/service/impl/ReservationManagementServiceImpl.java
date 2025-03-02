@@ -24,7 +24,6 @@ import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
-@Transactional
 public class ReservationManagementServiceImpl implements ReservationManagementService {
 
     private ReservationMstRepository reservationMstRepository;
@@ -40,6 +39,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * @return 201 HttpStatus if successfully created
      */
     @Override
+    @Transactional
     public ResponseEntity<Map<String, String>> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException {
 
         validateTransaction(reservationDto);
@@ -82,6 +82,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * @return HttpStatus
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException {
         Optional<TransactionMst> transactionOpt = transactionMstRepository.findById(trxId);
 
@@ -118,6 +119,26 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     public ResponseEntity<Object> getReservationDetails() {
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByCreatedUser(user.getUsername()), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to update reservation status
+     */
+    @Override
+    public ResponseEntity<Object> updateReservationStatus(Integer reservationId, Character status) throws BMSCheckedException {
+        Optional<ReservationMst> reservationMstOpt = reservationMstRepository.findById(reservationId);
+
+        if (reservationMstOpt.isEmpty()) {
+            throw new BMSCheckedException(RESERVATION_NOT_FOUND);
+        }
+
+        ReservationMst reservationMst = reservationMstOpt.get();
+        reservationMst.setStatus(status);
+        reservationMst.setUpdateOn(new Date());
+        reservationMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        reservationMstRepository.save(reservationMst);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

@@ -14,4 +14,6 @@ public interface ReservationManagementService {
     ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException;
 
     ResponseEntity<Object> getReservationDetails();
+
+    ResponseEntity<Object> updateReservationStatus(Integer reservationId, Character status) throws BMSCheckedException;
 }

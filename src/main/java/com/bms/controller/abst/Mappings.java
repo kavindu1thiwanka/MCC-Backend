@@ -60,6 +60,7 @@ public abstract class Mappings {
     public static final String CREATE_RESERVATION_V1 = VERSION_V1 + "/create_reservation";
     public static final String UPDATE_RESERVATION_DETAILS_V1 = VERSION_V1 + "/update_reservation_details";
     public static final String GET_RESERVATION_DETAILS_V1 = VERSION_V1 + "/get_reservation_details";
+    public static final String UPDATE_RESERVATION_STATUS_V1 = VERSION_V1 + "/update_reservation_status";
 
     // Payment Management Mappings
     public static final String CREATE_PAYMENT_SESSION = "/create-payment-session";
