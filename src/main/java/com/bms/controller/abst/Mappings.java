@@ -32,6 +32,8 @@ public abstract class Mappings {
     public static final String DELETE_USER_V1 = VERSION_V1 + "/delete_user";
     public static final String DELETE_USER_BULK_V1 = VERSION_V1 + "/delete_user_bulk";
     public static final String GET_ALL_USERS_V1 = VERSION_V1 + "/get_all_users";
+    public static final String GET_ALL_DRIVERS_V1 = VERSION_V1 + "/get_all_drivers";
+    public static final String GET_ALL_ADMIN_V1 = VERSION_V1 + "/get_all_admins";
     public static final String GET_USER_DETAILS_V1 = VERSION_V1 + "/get_user_details";
     public static final String GET_USER_ADDRESS_V1 = VERSION_V1 + "/get_user_address";
     public static final String UPDATE_USER_ADDRESS_V1 = VERSION_V1 + "/update_user_address";

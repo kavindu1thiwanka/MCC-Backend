@@ -80,6 +80,16 @@ public class UserManagementController {
         return userManagementService.getAllUsers();
     }
 
+    @GetMapping(GET_ALL_DRIVERS_V1)
+    public ResponseEntity<Object> getAllDrivers() {
+        return userManagementService.getAllDrivers();
+    }
+
+    @GetMapping(GET_ALL_ADMIN_V1)
+    public ResponseEntity<Object> getAllAdmins() {
+        return userManagementService.getAllAdmins();
+    }
+
     @Autowired
     public void setUserManagementService(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;

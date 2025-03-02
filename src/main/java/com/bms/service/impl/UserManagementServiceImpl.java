@@ -360,6 +360,22 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
+     * This method is used to retrieve all drivers
+     */
+    @Override
+    public ResponseEntity<Object> getAllDrivers() {
+        return new ResponseEntity<>(userMstRepository.getAllDrivers(), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve all admins
+     */
+    @Override
+    public ResponseEntity<Object> getAllAdmins() {
+        return new ResponseEntity<>(userMstRepository.getAllAdmins(), HttpStatus.OK);
+    }
+
+    /**
      * This method is used to retrieve user details related to provided user id
      */
     private UserMst getExistingUser(Integer userId) {

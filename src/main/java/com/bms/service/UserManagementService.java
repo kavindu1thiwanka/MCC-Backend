@@ -32,4 +32,8 @@ public interface UserManagementService {
     ResponseEntity<Object> getLoggedInUserDetails();
 
     ResponseEntity<Object> getAllUsers();
+
+    ResponseEntity<Object> getAllDrivers();
+
+    ResponseEntity<Object> getAllAdmins();
 }
