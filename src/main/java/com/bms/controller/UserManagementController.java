@@ -75,6 +75,11 @@ public class UserManagementController {
         return userManagementService.getLoggedInUserDetails();
     }
 
+    @GetMapping(GET_ALL_USERS_V1)
+    public ResponseEntity<Object> getAllUsers() {
+        return userManagementService.getAllUsers();
+    }
+
     @Autowired
     public void setUserManagementService(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;

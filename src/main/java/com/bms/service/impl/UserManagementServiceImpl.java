@@ -36,7 +36,6 @@ import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
-@Transactional
 public class UserManagementServiceImpl implements UserManagementService, UserDetailsService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -58,6 +57,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return ResponseEntity
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException {
 
         validateUserCreate(user);
@@ -106,6 +106,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException {
 
         if (userDetails.getId() == null) {
@@ -131,8 +132,8 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> activateUser(Integer userId) throws BMSCheckedException {
-
         changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_ACTIVE);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -144,8 +145,8 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> inactivateUser(Integer userId) throws BMSCheckedException {
-
         changeUserStatus(new ArrayList<>(userId), STATUS_INACTIVE);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -157,8 +158,8 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> deleteUser(Integer userId) throws BMSCheckedException {
-
         changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_DELETE);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -202,6 +203,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException {
 
         Optional<UserMst> userOpt = userMstRepository.findUserByUuid(uuid);
@@ -256,7 +258,6 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     public ResponseEntity<Object> getUserAddress() {
-
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return new ResponseEntity<>(addressMstRepository.getAddressMstByUserName(user.getUsername()), HttpStatus.OK);
     }
@@ -268,6 +269,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus
      */
     @Override
+    @Transactional
     public ResponseEntity<Object> updateUserAddress(AddressDto address) {
 
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -292,7 +294,13 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * This method is used to reset password
+     *
+     * @param requestBody token and new password
+     */
     @Override
+    @Transactional
     public ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BMSCheckedException {
         String extractedUsername = jwtUtil.extractUsername((String) requestBody.get("token"));
 
@@ -326,7 +334,6 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
     /**
      * This method is used to retrieve logged-in user details
-     *
      */
     @Override
     public ResponseEntity<Object> getLoggedInUserDetails() {
@@ -342,6 +349,14 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         UserDto userDto = new UserDto(userOpt.get());
 
         return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve all users
+     */
+    @Override
+    public ResponseEntity<Object> getAllUsers() {
+        return new ResponseEntity<>(userMstRepository.getAllUsers(), HttpStatus.OK);
     }
 
     /**

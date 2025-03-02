@@ -30,4 +30,6 @@ public interface UserManagementService {
     ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BMSCheckedException;
 
     ResponseEntity<Object> getLoggedInUserDetails();
+
+    ResponseEntity<Object> getAllUsers();
 }
