@@ -39,6 +39,9 @@ public class ReservationMst extends CommonBaseEntity implements Serializable {
     @Column(name = "return_location", nullable = false)
     private String returnLocation;
 
+    @Column(name = "on_trip")
+    private Boolean onTrip;
+
     @Column(name = "payment_status", nullable = false)
     private Character paymentStatus;
 

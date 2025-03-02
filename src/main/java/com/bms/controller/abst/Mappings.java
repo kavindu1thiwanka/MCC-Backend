@@ -6,6 +6,7 @@ public abstract class Mappings {
     public static final String AUTH = "/auth";
     public static final String USER = "/user";
     public static final String DRIVER = "/driver";
+    public static final String ADMIN = "/admin";
     public static final String ROLE = "/role";
     public static final String MENU = "/menu";
     public static final String VEHICLE = "/vehicle";
@@ -64,6 +65,9 @@ public abstract class Mappings {
 
     // Payment Management Mappings
     public static final String CREATE_PAYMENT_SESSION = "/create-payment-session";
+
+    // Admin Management Mappings
+    public static final String LOAD_ADMIN_DASHBOARD_DETAILS_V1 = VERSION_V1 + "/load_admin_dashboard_details";
 
     // Driver Management Mappings
     public static final String UPDATE_ONLINE_STATUS_V1 = VERSION_V1 + "/update_online_status";

@@ -49,6 +49,9 @@ public class UserMst extends CommonBaseEntity implements Serializable {
     @Column(name = "is_online")
     private Character isOnline;
 
+    @Column(name = "on_trip")
+    private Boolean onTrip;
+
     @Column(name = "status", nullable = false)
     private Character status;
 
