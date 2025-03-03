@@ -126,63 +126,27 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
-     * This method is used to activate user
+     * This method is used to change user status
      *
-     * @param userId user id
-     * @return HttpStatus 200
+     * @param userId userId that needs to be changed the status
+     * @param status Active, Inactive or Deleted
      */
     @Override
-    @Transactional
-    public ResponseEntity<Object> activateUser(Integer userId) throws BMSCheckedException {
-        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_ACTIVE);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * This method is used to inactivate user
-     *
-     * @param userId user id
-     * @return HttpStatus 200
-     */
-    @Override
-    @Transactional
-    public ResponseEntity<Object> inactivateUser(Integer userId) throws BMSCheckedException {
-        changeUserStatus(new ArrayList<>(userId), STATUS_INACTIVE);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * This method is used to delete user
-     *
-     * @param userId user id
-     * @return HttpStatus 200
-     */
-    @Override
-    @Transactional
-    public ResponseEntity<Object> deleteUser(Integer userId) throws BMSCheckedException {
-        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_DELETE);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * This method is used to change user's status
-     */
-    private void changeUserStatus(List<Integer> userIdList, Character status) throws BMSCheckedException {
-
-        if (userIdList == null || userIdList.isEmpty()) {
-            throw new BMSCheckedException(USER_IDS_CANNOT_BE_EMPTY);
+    public ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BMSCheckedException {
+        if (userId == null) {
+            throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
         }
 
-        List<UserMst> updatedUserList = new ArrayList<>();
-
-        for (Integer userId : userIdList) {
-            UserMst existingUser = getExistingUser(userId);
-            existingUser.setStatus(status);
-            setUsersUpdatedMetaData(existingUser);
-            updatedUserList.add(existingUser);
+        if (status == null) {
+            throw new BMSCheckedException(USER_STATUS_CANNOT_BE_EMPTY);
         }
 
-        userMstRepository.saveAll(updatedUserList);
+        UserMst existingUser = getExistingUser(userId);
+        existingUser.setStatus(status);
+        setUsersUpdatedMetaData(existingUser);
+
+        userMstRepository.save(existingUser);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

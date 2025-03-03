@@ -13,11 +13,7 @@ public interface UserManagementService {
 
     ResponseEntity<Object> updateUser(UserDto user) throws BMSCheckedException;
 
-    ResponseEntity<Object> activateUser(Integer userId) throws BMSCheckedException;
-
-    ResponseEntity<Object> inactivateUser(Integer userId) throws BMSCheckedException;
-
-    ResponseEntity<Object> deleteUser(Integer userId) throws BMSCheckedException;
+    ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BMSCheckedException;
 
     ResponseEntity<Object> getUserDetails(Integer userId);
 

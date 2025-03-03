@@ -25,12 +25,7 @@ public abstract class Mappings {
     public static final String REGISTER_USER_V1 = VERSION_V1 + "/register";
     public static final String CONFIRM_USER_EMAIL_V1 = VERSION_V1 + "/confirm";
     public static final String UPDATE_USER_V1 = VERSION_V1 + "/update_user";
-    public static final String ACTIVATE_USER_V1 = VERSION_V1 + "/activate_user";
-    public static final String ACTIVATE_USER_BULK_V1 = VERSION_V1 + "/activate_user_bulk";
-    public static final String INACTIVATE_USER_V1 = VERSION_V1 + "/inactivate_user";
-    public static final String INACTIVATE_USER_BULK_V1 = VERSION_V1 + "/inactivate_user_bulk";
-    public static final String DELETE_USER_V1 = VERSION_V1 + "/delete_user";
-    public static final String DELETE_USER_BULK_V1 = VERSION_V1 + "/delete_user_bulk";
+    public static final String CHANGE_USER_STATUS_V1 = VERSION_V1 + "/change_user_status";
     public static final String GET_ALL_USERS_V1 = VERSION_V1 + "/get_all_users";
     public static final String GET_ALL_DRIVERS_V1 = VERSION_V1 + "/get_all_drivers";
     public static final String GET_ALL_ADMIN_V1 = VERSION_V1 + "/get_all_admins";

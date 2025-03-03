@@ -35,19 +35,9 @@ public class UserManagementController {
         return userManagementService.updateUser(user);
     }
 
-    @PutMapping(ACTIVATE_USER_V1)
-    public ResponseEntity<Object> activateUser(@RequestParam Integer userId) throws BMSCheckedException {
-        return userManagementService.activateUser(userId);
-    }
-
-    @PutMapping(INACTIVATE_USER_V1)
-    public ResponseEntity<Object> inactivateUser(@RequestParam Integer userId) throws BMSCheckedException {
-        return userManagementService.inactivateUser(userId);
-    }
-
-    @DeleteMapping(DELETE_USER_V1)
-    public ResponseEntity<Object> deleteUser(@RequestParam Integer userId) throws BMSCheckedException {
-        return userManagementService.deleteUser(userId);
+    @PutMapping(CHANGE_USER_STATUS_V1)
+    public ResponseEntity<Object> changeUserStatus(@RequestParam Integer userId, @RequestParam Character status) throws BMSCheckedException {
+        return userManagementService.changeUserStatus(userId, status);
     }
 
     @GetMapping(GET_USER_DETAILS_V1)
