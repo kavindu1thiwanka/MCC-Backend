@@ -33,14 +33,24 @@ public class VehicleManagementController {
         return vehicleManagementService.getVehicleTotalCost(reservationDto);
     }
 
-    @PostMapping
+    @PostMapping(ADD_VEHICLE_V1)
     public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
         return vehicleManagementService.addVehicle(vehicleMstDto, vehicleImage);
     }
 
-    @PutMapping
+    @PutMapping(UPDATE_VEHICLE_V1)
     public ResponseEntity<Object> updateVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
         return vehicleManagementService.updateVehicle(vehicleMstDto, vehicleImage);
+    }
+
+    @PutMapping(UPDATE_VEHICLE_STATUS_V1)
+    public ResponseEntity<Object> updateVehicleStatus(@RequestParam String vehicleNumber, @RequestParam Character status) throws BMSCheckedException {
+        return vehicleManagementService.updateVehicleStatus(vehicleNumber, status);
+    }
+
+    @GetMapping(GET_ALL_VEHICLE_LIST_V1)
+    public ResponseEntity<Object> getAllVehicleList() {
+        return vehicleManagementService.getAllVehicleList();
     }
 
     @Autowired

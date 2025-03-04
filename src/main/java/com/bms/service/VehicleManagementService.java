@@ -17,5 +17,9 @@ public interface VehicleManagementService {
 
     ResponseEntity<Object> getVehicleTotalCost(ReservationDto reservationDto);
 
-    ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage);
+    ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BMSCheckedException, IOException;
+
+    ResponseEntity<Object> updateVehicleStatus(String vehicleNumber, Character status) throws BMSCheckedException;
+
+    ResponseEntity<Object> getAllVehicleList();
 }

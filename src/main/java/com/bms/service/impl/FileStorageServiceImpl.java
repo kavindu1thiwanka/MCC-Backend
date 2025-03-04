@@ -1,6 +1,8 @@
 package com.bms.service.impl;
 
 import com.bms.service.FileStorageService;
+import com.bms.util.BMSCheckedException;
+import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +52,16 @@ public class FileStorageServiceImpl implements FileStorageService {
      * @param vehicleNo vehicle number
      */
     @Override
-    public String uploadVehicleImage(MultipartFile file, String vehicleNo) throws IOException {
+    public String uploadVehicleImage(MultipartFile file, String vehicleNo, String existingImage) throws IOException, BMSCheckedException {
+
+        if (existingImage != null && !existingImage.isEmpty()) {
+            try {
+                BlobId blobId = BlobId.of(bucketName, existingImage);
+                storage.delete(blobId);
+            } catch (Exception e) {
+                throw new BMSCheckedException("Error deleting file: " + existingImage, e);
+            }
+        }
 
         String fileName = vehicleNo + "-" + file.getOriginalFilename();
         String path = "mcc/vehicles/" + fileName;

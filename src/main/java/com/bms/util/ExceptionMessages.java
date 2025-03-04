@@ -50,5 +50,6 @@ public abstract class ExceptionMessages {
     public static final String SEATS_AMOUNT_CANNOT_BE_NULL = "Seats amount cannot be null";
     public static final String GEAR_TYPE_CANNOT_BE_EMPTY = "Gear type cannot be empty";
     public static final String PRICE_PER_DAY_CANNOT_BE_NULL = "Price per day cannot be null";
+    public static final String VEHICLE_NOT_FOUND = "Vehicle not found.";
 
 }

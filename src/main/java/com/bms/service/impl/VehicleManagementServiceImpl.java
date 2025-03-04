@@ -112,7 +112,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         vehicleMst.setStatus(STATUS_ACTIVE);
 
         if (vehicleImage != null) {
-            vehicleMst.setVehicleImage(fileStorageService.uploadVehicleImage(vehicleImage, vehicleMstDto.getVehicleNo()));
+            vehicleMst.setVehicleImage(fileStorageService.uploadVehicleImage(vehicleImage, vehicleMstDto.getVehicleNo(), null));
         }
 
         vehicleMst.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -182,10 +182,63 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * This method is used to update vehicle
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) {
-        return null;
+    public ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+
+        VehicleMst existingVehicle = getExistingVehicle(vehicleMstDto.getVehicleNo());
+
+        existingVehicle.setVehicleNo(vehicleMstDto.getVehicleNo());
+        existingVehicle.setVehicleModel(vehicleMstDto.getName());
+        existingVehicle.setVehicleType(vehicleMstDto.getVehicleType());
+        existingVehicle.setCategory(vehicleMstDto.getCategory());
+        existingVehicle.setSeats(vehicleMstDto.getSeats());
+        existingVehicle.setGearType(vehicleMstDto.getGearType());
+        existingVehicle.setPricePerDay(vehicleMstDto.getPricePerDay());
+
+        if (vehicleImage != null) {
+            existingVehicle.setVehicleImage(fileStorageService.uploadVehicleImage(vehicleImage, vehicleMstDto.getVehicleNo(),
+                    existingVehicle.getVehicleImage()));
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to update vehicle status
+     */
+    @Override
+    public ResponseEntity<Object> updateVehicleStatus(String vehicleNumber, Character status) throws BMSCheckedException {
+
+        VehicleMst existingVehicle = getExistingVehicle(vehicleNumber);
+        existingVehicle.setStatus(status);
+        vehicleMstRepository.save(existingVehicle);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get vehicle list
+     */
+    @Override
+    public ResponseEntity<Object> getAllVehicleList() {
+        return new ResponseEntity<>(vehicleMstRepository.getVehicleListGroupByCategory(), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get existing vehicle details
+     */
+    private VehicleMst getExistingVehicle(String vehicleNumber) throws BMSCheckedException {
+        Optional<VehicleMst> vehicleOpt = vehicleMstRepository.findByVehicleNo(vehicleNumber);
+
+        if (vehicleOpt.isEmpty()) {
+            throw new BMSCheckedException(VEHICLE_NOT_FOUND);
+        }
+
+        return vehicleOpt.get();
     }
 
     @Autowired
