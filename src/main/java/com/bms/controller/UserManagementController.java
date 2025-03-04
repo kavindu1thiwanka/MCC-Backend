@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static com.bms.controller.abst.Mappings.*;
@@ -31,7 +33,7 @@ public class UserManagementController {
     }
 
     @PutMapping(UPDATE_USER_V1)
-    public ResponseEntity<Object> updateUser(@RequestBody UserDto user) throws BMSCheckedException {
+    public ResponseEntity<Object> updateUser(@ModelAttribute UserDto user) throws BMSCheckedException, IOException {
         return userManagementService.updateUser(user);
     }
 

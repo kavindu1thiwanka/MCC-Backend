@@ -4,6 +4,7 @@ import com.bms.entity.UserMst;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +22,7 @@ public class UserDto {
     private String driverLicenseNo;
     private Character status;
     private String identifier;
+    private MultipartFile drivingLicense;
 
     public UserDto(UserMst userMst) {
         this.id = userMst.getId();

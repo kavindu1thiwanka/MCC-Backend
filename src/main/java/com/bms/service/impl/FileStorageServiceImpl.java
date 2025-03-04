@@ -75,6 +75,32 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     /**
+     * This method is used to upload driver license to Google Cloud Storage
+     */
+    @Override
+    public String uploadDriverLicense(MultipartFile file, String driverLicenseNo, String existingDrivingImage) throws IOException, BMSCheckedException {
+
+        if (existingDrivingImage != null && !existingDrivingImage.isEmpty()) {
+            try {
+                BlobId blobId = BlobId.of(bucketName, existingDrivingImage);
+                storage.delete(blobId);
+            } catch (Exception e) {
+                throw new BMSCheckedException("Error deleting file: " + existingDrivingImage, e);
+            }
+        }
+
+        String fileName = driverLicenseNo + "-" + file.getOriginalFilename();
+        String path = "mcc/driving_licenses/" + fileName;
+
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, path)
+                .setContentType(file.getContentType())
+                .build();
+
+        storage.create(blobInfo, file.getBytes());
+        return String.format(cloudStorageUrl, bucketName, path);
+    }
+
+    /**
      * This method is used to upload file to Google Cloud Storage
      * for a specific folder
      *

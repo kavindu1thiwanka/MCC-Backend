@@ -4,14 +4,16 @@ import com.bms.dto.AddressDto;
 import com.bms.dto.UserDto;
 import com.bms.util.BMSCheckedException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 public interface UserManagementService {
 
     ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException;
 
-    ResponseEntity<Object> updateUser(UserDto user) throws BMSCheckedException;
+    ResponseEntity<Object> updateUser(UserDto user) throws BMSCheckedException, IOException;
 
     ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BMSCheckedException;
 

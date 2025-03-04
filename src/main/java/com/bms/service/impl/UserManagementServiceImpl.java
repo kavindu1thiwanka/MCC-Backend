@@ -11,6 +11,7 @@ import com.bms.repository.AddressMstRepository;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.repository.CommonEmailTemplateRepository;
 import com.bms.repository.UserMstRepository;
+import com.bms.service.FileStorageService;
 import com.bms.service.UserManagementService;
 import com.bms.util.BMSCheckedException;
 import org.jsoup.Jsoup;
@@ -29,7 +30,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 import static com.bms.util.CommonConstants.*;
@@ -44,6 +47,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     private CommonEmailTemplateRepository commonEmailTemplateRepository;
     private AddressMstRepository addressMstRepository;
     private JwtUtil jwtUtil;
+    private FileStorageService fileStorageService;
 
     @Value(CONFIRM_USER_EMAIL_URL)
     private String confirmUserEmailUrl;
@@ -107,7 +111,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException {
+    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException, IOException {
 
         if (userDetails.getId() == null) {
             throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
@@ -118,6 +122,11 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         existingUser.setPassword((userDetails.getPassword() == null || userDetails.getPassword().isEmpty())
                 ? existingUser.getPassword() : passwordEncoder.encode(userDetails.getPassword()));
         setUsersUpdatedMetaData(existingUser);
+
+        if (userDetails.getDrivingLicense() != null) {
+            existingUser.setDriverLicenseUrl(fileStorageService.uploadDriverLicense(userDetails.getDrivingLicense(), userDetails.getDriverLicenseNo(),
+                    existingUser.getDriverLicenseUrl()));
+        }
 
         userMstRepository.save(existingUser);
 
@@ -458,5 +467,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     @Autowired
     public void setJwtUtil(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
+    }
+
+    @Autowired
+    public void setFileStorageService(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 }

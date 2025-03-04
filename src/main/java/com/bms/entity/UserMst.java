@@ -46,6 +46,9 @@ public class UserMst extends CommonBaseEntity implements Serializable {
     @Column(name = "driver_license_no")
     private String driverLicenseNo;
 
+    @Column(name = "driver_license_url")
+    private String driverLicenseUrl;
+
     @Column(name = "is_online")
     private Character isOnline;
 

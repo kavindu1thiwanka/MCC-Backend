@@ -11,5 +11,7 @@ public interface FileStorageService {
 
     String uploadVehicleImage(MultipartFile file, String vehicleNo, String existingImage) throws IOException, BMSCheckedException;
 
+    String uploadDriverLicense(MultipartFile file, String driverLicenseNo, String existingImage) throws IOException, BMSCheckedException;
+
     String uploadFile(MultipartFile file, String folderName) throws IOException;
 }
