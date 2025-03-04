@@ -26,7 +26,7 @@ import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class RoleManagementServiceImpl implements RoleManagementService {
 
     private RoleMstRepository roleMstRepository;

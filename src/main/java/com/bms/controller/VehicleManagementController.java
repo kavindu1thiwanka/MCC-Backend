@@ -38,6 +38,11 @@ public class VehicleManagementController {
         return vehicleManagementService.addVehicle(vehicleMstDto, vehicleImage);
     }
 
+    @PutMapping
+    public ResponseEntity<Object> updateVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+        return vehicleManagementService.updateVehicle(vehicleMstDto, vehicleImage);
+    }
+
     @Autowired
     public void setVehicleManagementService(VehicleManagementService vehicleManagementService) {
         this.vehicleManagementService = vehicleManagementService;

@@ -39,7 +39,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * @return 201 HttpStatus if successfully created
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Map<String, String>> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException {
 
         validateTransaction(reservationDto);
@@ -82,7 +82,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * @return HttpStatus
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException {
         Optional<TransactionMst> transactionOpt = transactionMstRepository.findById(trxId);
 

@@ -37,7 +37,6 @@ import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.EMAIL_TEMPLATE_NOT_FOUND;
 
 @Service
-@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private AuthenticationManager authenticationManager;
@@ -106,6 +105,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> sendPasswordResetMail(String email) throws BMSCheckedException {
 
         Optional<UserMst> userOpt = userMstRepository.findByEmailAndStatusNot(email, STATUS_DELETE);

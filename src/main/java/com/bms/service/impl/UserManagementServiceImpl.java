@@ -57,7 +57,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return ResponseEntity
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException {
 
         validateUserCreate(user);
@@ -106,7 +106,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException {
 
         if (userDetails.getId() == null) {
@@ -167,7 +167,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException {
 
         Optional<UserMst> userOpt = userMstRepository.findUserByUuid(uuid);
@@ -233,7 +233,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> updateUserAddress(AddressDto address) {
 
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -264,7 +264,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @param requestBody token and new password
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BMSCheckedException {
         String extractedUsername = jwtUtil.extractUsername((String) requestBody.get("token"));
 

@@ -18,7 +18,6 @@ import static com.bms.util.CommonConstants.MENU_TYPE_MAIN_MENU;
 import static com.bms.util.CommonConstants.MENU_TYPE_SUB_MENU;
 
 @Service
-@Transactional
 public class MenuManagementServiceImpl implements MenuManagementService {
 
     private MenuMstRepository menuMstRepository;

@@ -27,7 +27,6 @@ import static com.bms.util.CommonConstants.STATUS_ACTIVE;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
-@Transactional
 public class VehicleManagementServiceImpl implements VehicleManagementService {
 
     private VehicleManagementCustomRepository vehicleManagementCustomRepository;
@@ -97,6 +96,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
      * This method is used to add vehicle
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BMSCheckedException, IOException {
 
         validateVehicleDetails(vehicleMstDto);
@@ -180,6 +180,12 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         response.put("totalCost", totalCost);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) {
+        return null;
     }
 
     @Autowired
