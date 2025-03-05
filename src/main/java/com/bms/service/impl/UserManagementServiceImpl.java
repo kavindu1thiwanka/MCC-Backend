@@ -77,6 +77,25 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
+     * This method is used to create users through admin dashboard
+     * the difference between this method and registerUser is that this method will not send confirmation email
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> createUser(UserDto user) throws BMSCheckedException, IOException {
+
+        validateUserCreate(user);
+        UserMst userMst = new UserMst(user);
+        userMst.setStatus(STATUS_ACTIVE);
+        userMst.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getDrivingLicense() != null) {
+            userMst.setDriverLicenseUrl(fileStorageService.uploadDriverLicense(user.getDrivingLicense(), user.getDriverLicenseNo(), null));
+        }
+        userMstRepository.save(userMst);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
      * This method is used to send confirmation email to user
      *
      * @param userMst user details
@@ -390,7 +409,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         if (user.getIdentifier() == null) {
             throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
-        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER).contains(user.getIdentifier())) {
+        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER, IDENTIFIER_ROLE_ADMIN).contains(user.getIdentifier())) {
             throw new BMSCheckedException(INVALID_IDENTIFIER);
         }
 
@@ -400,6 +419,9 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
                 break;
             case IDENTIFIER_ROLE_DRIVER:
                 user.setId(ROLE_ID_DRIVER);
+                break;
+            case IDENTIFIER_ROLE_ADMIN:
+                user.setId(ROLE_ID_ADMIN);
                 break;
         }
 

@@ -13,6 +13,8 @@ public interface UserManagementService {
 
     ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException;
 
+    ResponseEntity<Object> createUser(UserDto user) throws BMSCheckedException, IOException;
+
     ResponseEntity<Object> updateUser(UserDto user) throws BMSCheckedException, IOException;
 
     ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BMSCheckedException;

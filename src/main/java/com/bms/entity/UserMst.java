@@ -77,6 +77,9 @@ public class UserMst extends CommonBaseEntity implements Serializable {
             case IDENTIFIER_ROLE_DRIVER:
                 this.roleId = ROLE_ID_DRIVER;
                 break;
+            case IDENTIFIER_ROLE_ADMIN:
+                this.roleId = ROLE_ID_ADMIN;
+                break;
         }
 
         if (this.roleId == ROLE_ID_DRIVER) {

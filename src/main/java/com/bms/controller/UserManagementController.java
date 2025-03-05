@@ -27,6 +27,11 @@ public class UserManagementController {
         return userManagementService.registerUser(user);
     }
 
+    @PostMapping(CREATE_USER_V1)
+    public ResponseEntity<Object> createUser(@ModelAttribute UserDto user) throws BMSCheckedException, IOException {
+        return userManagementService.createUser(user);
+    }
+
     @GetMapping(CONFIRM_USER_EMAIL_V1)
     public ResponseEntity<Object> confirmUserEmail(@RequestParam String uuid) throws BMSCheckedException {
         return userManagementService.confirmUserEmail(uuid);
