@@ -21,6 +21,7 @@ public abstract class ExceptionMessages {
     public static final String INVALID_IDENTIFIER = "Invalid identifier";
     public static final String NEW_PASSWORD_SAME_AS_OLD_PASSWORD = "New password cannot be same as old password.";
     public static final String NEW_PASSWORD_CANNOT_BE_EMPTY = "New password cannot be empty.";
+    public static final String USER_STATUS_CHANGE_NOT_ALLOWED = "User status change is not allowed.";
 
     // Role Related Exceptions
     public static final String ROLE_ID_CANNOT_BE_EMPTY = "Role id cannot be empty";

@@ -58,6 +58,8 @@ public class UserMst extends CommonBaseEntity implements Serializable {
     @Column(name = "status", nullable = false)
     private Character status;
 
+    private transient boolean isLoggedInProfileUpdated;
+
     public UserMst(UserDto user) {
         this.uuid = UUID.randomUUID().toString();
         this.firstName = user.getFirstName();

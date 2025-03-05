@@ -130,6 +130,8 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         userMstRepository.save(existingUser);
 
+        existingUser.setLoggedInProfileUpdated(SecurityContextHolder.getContext().getAuthentication().getName().equals(existingUser.getUsername()));
+
         return new ResponseEntity<>(existingUser, HttpStatus.OK);
 
     }
@@ -141,6 +143,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @param status Active, Inactive or Deleted
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BMSCheckedException {
         if (userId == null) {
             throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
@@ -151,6 +154,13 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         }
 
         UserMst existingUser = getExistingUser(userId);
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user.getUsername().equals(existingUser.getUsername())) {
+            throw new BMSCheckedException(USER_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
         existingUser.setStatus(status);
         setUsersUpdatedMetaData(existingUser);
 
