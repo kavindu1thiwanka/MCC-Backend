@@ -62,6 +62,11 @@ public class VehicleManagementController {
         return vehicleManagementService.getAllVehicleList();
     }
 
+    @GetMapping(GET_VEHICLE_DETAILS_V1)
+    public ResponseEntity<Object> getVehicleDetails(@RequestParam String vehicleNumber) throws BMSCheckedException {
+        return vehicleManagementService.getVehicleDetails(vehicleNumber);
+    }
+
     @Autowired
     public void setVehicleManagementService(VehicleManagementService vehicleManagementService) {
         this.vehicleManagementService = vehicleManagementService;

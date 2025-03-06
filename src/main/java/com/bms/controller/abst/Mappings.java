@@ -55,6 +55,7 @@ public abstract class Mappings {
     public static final String UPDATE_VEHICLE_V1 = VERSION_V1 + "/update_vehicle";
     public static final String UPDATE_VEHICLE_STATUS_V1 = VERSION_V1 + "/update_vehicle_status";
     public static final String GET_ALL_VEHICLE_LIST_V1 = VERSION_V1 + "/get_all_vehicle_list";
+    public static final String GET_VEHICLE_DETAILS_V1 = VERSION_V1 + "/get_vehicle_details";
 
     // Menu Management Mappings
     public static final String GET_MENU_LIST_V1 = VERSION_V1 + "/get_menu_list";

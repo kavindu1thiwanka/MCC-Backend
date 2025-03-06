@@ -33,7 +33,7 @@ public class VehicleMst implements Serializable {
     private Integer seats;
 
     @Column(name = "gear_type", nullable = false)
-    private String gearType;
+    private Character gearType;
 
     @Column(name = "vehicle_image", nullable = false)
     private String vehicleImage;

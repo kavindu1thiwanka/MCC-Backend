@@ -22,4 +22,6 @@ public interface VehicleManagementService {
     ResponseEntity<Object> updateVehicleStatus(String vehicleNumber, Character status) throws BMSCheckedException;
 
     ResponseEntity<Object> getAllVehicleList();
+
+    ResponseEntity<Object> getVehicleDetails(String vehicleNumber) throws BMSCheckedException;
 }

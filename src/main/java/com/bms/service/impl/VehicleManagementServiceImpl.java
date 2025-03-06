@@ -4,6 +4,7 @@ import com.bms.dto.CommonFilterDto;
 import com.bms.dto.ReservationDto;
 import com.bms.dto.VehicleMstDto;
 import com.bms.entity.ReservationMst;
+import com.bms.entity.UserMst;
 import com.bms.entity.VehicleMst;
 import com.bms.repository.ReservationMstRepository;
 import com.bms.repository.VehicleManagementCustomRepository;
@@ -115,7 +116,9 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
             vehicleMst.setVehicleImage(fileStorageService.uploadVehicleImage(vehicleImage, vehicleMstDto.getVehicleNo(), null));
         }
 
-        vehicleMst.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        vehicleMst.setCreatedBy(user.getUsername());
         vehicleMst.setCreatedOn(new Date());
         vehicleMstRepository.save(vehicleMst);
 
@@ -146,7 +149,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
             throw new BMSCheckedException(SEATS_AMOUNT_CANNOT_BE_NULL);
         }
 
-        if (vehicleMstDto.getGearType() == null || vehicleMstDto.getGearType().isEmpty()) {
+        if (vehicleMstDto.getGearType() == null) {
             throw new BMSCheckedException(GEAR_TYPE_CANNOT_BE_EMPTY);
         }
 
@@ -211,6 +214,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
      * This method is used to update vehicle status
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> updateVehicleStatus(String vehicleNumber, Character status) throws BMSCheckedException {
 
         VehicleMst existingVehicle = getExistingVehicle(vehicleNumber);
@@ -226,6 +230,20 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Override
     public ResponseEntity<Object> getAllVehicleList() {
         return new ResponseEntity<>(vehicleMstRepository.getVehicleListGroupByCategory(), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get vehicle details
+     */
+    @Override
+    public ResponseEntity<Object> getVehicleDetails(String vehicleNumber) throws BMSCheckedException {
+        Optional<VehicleMst> vehicleOpt = vehicleMstRepository.findByVehicleNo(vehicleNumber);
+
+        if (vehicleOpt.isEmpty()) {
+            throw new BMSCheckedException(VEHICLE_NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(vehicleOpt.get(), HttpStatus.OK);
     }
 
     /**
