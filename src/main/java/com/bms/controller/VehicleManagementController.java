@@ -5,8 +5,10 @@ import com.bms.dto.ReservationDto;
 import com.bms.dto.VehicleMstDto;
 import com.bms.service.VehicleManagementService;
 import com.bms.util.BMSCheckedException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
@@ -33,10 +35,17 @@ public class VehicleManagementController {
         return vehicleManagementService.getVehicleTotalCost(reservationDto);
     }
 
-    @PostMapping(ADD_VEHICLE_V1)
-    public ResponseEntity<Object> addVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+    @PostMapping(value = ADD_VEHICLE_V1, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Object> addVehicle(
+            @RequestPart("vehicleMstDto") String vehicleMstDtoJson,
+            @RequestPart("vehicleImage") MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        VehicleMstDto vehicleMstDto = objectMapper.readValue(vehicleMstDtoJson, VehicleMstDto.class);
+
         return vehicleManagementService.addVehicle(vehicleMstDto, vehicleImage);
     }
+
 
     @PutMapping(UPDATE_VEHICLE_V1)
     public ResponseEntity<Object> updateVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
