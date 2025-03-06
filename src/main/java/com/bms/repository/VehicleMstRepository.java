@@ -19,6 +19,6 @@ public interface VehicleMstRepository extends JpaRepository<VehicleMst, String> 
     @Query("SELECT mst FROM VehicleMst mst WHERE mst.vehicleNo = :vehicleNo AND mst.status <> '" + STATUS_DELETE + "'")
     Optional<VehicleMst> findByVehicleNo(String vehicleNo);
 
-    @Query("SELECT mst FROM VehicleMst mst WHERE mst.status <> '" + STATUS_DELETE + "' GROUP BY mst.category ORDER BY mst.createdOn DESC")
+    @Query("SELECT mst FROM VehicleMst mst WHERE mst.status <> '" + STATUS_DELETE + "' ORDER BY mst.category ASC, mst.createdOn DESC")
     List<VehicleMst> getVehicleListGroupByCategory();
 }
