@@ -40,6 +40,16 @@ public class ReservationManagementController {
         return reservationManagementService.getReservationDetails();
     }
 
+    @GetMapping(GET_ACTIVE_RESERVATION_DETAILS_V1)
+    public ResponseEntity<Object> getActiveReservationDetails() throws BMSCheckedException {
+        return reservationManagementService.getActiveReservationDetails();
+    }
+
+    @GetMapping(GET_RESERVATION_HISTORY_DETAILS_V1)
+    public ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException {
+        return reservationManagementService.getReservationHistoryDetails();
+    }
+
     @Autowired
     public void setReservationManagementService(ReservationManagementService reservationManagementService) {
         this.reservationManagementService = reservationManagementService;

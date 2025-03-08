@@ -93,7 +93,8 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         TransactionMst transactionMst = transactionOpt.get();
         transactionMst.setStatus(paymentStatus);
         transactionMst.setUpdateOn(new Date());
-        transactionMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        transactionMst.setUpdateBy(user.getUsername());
         transactionMstRepository.save(transactionMst);
 
         Optional<ReservationMst> reservationOpt = reservationMstRepository.findById(transactionMst.getReservationId());
@@ -106,7 +107,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         reservationMst.setPaymentStatus(paymentStatus);
         reservationMst.setStatus(paymentStatus.equals(STATUS_COMPLETE) ? STATUS_ACTIVE : STATUS_FAILED);
         reservationMst.setUpdateOn(new Date());
-        reservationMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        reservationMst.setUpdateBy(user.getUsername());
         reservationMstRepository.save(reservationMst);
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -139,6 +140,22 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         reservationMstRepository.save(reservationMst);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get active reservation details
+     */
+    @Override
+    public ResponseEntity<Object> getActiveReservationDetails() throws BMSCheckedException {
+        return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByStatus(Arrays.asList(STATUS_ACTIVE)), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get reservation history details
+     */
+    @Override
+    public ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException {
+        return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByStatus(Arrays.asList(STATUS_COMPLETE, STATUS_RESERVATION_CANCELLED)), HttpStatus.OK);
     }
 
     /**

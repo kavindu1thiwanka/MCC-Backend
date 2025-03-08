@@ -61,20 +61,24 @@ public class AdminManagementServiceImpl implements AdminManagementService {
 
         for (ReservationMst reservation : reservationList) {
 
-            if (!lineChartLabels.contains(reservation.getPickUpDate().toString())) {
-               lineChartLabels.add(reservation.getPickUpDate().toString());
+            if (!lineChartLabels.contains(reservation.getPickUpDate().toString())
+                    && (reservation.getStatus().equals(STATUS_COMPLETE) || reservation.getStatus().equals(STATUS_RESERVATION_CANCELLED))) {
+               lineChartLabels.add(reservation.getPickUpDate().toString().split(" ")[0]);
             }
 
-            int index = lineChartLabels.indexOf(reservation.getPickUpDate().toString());
+            int index = lineChartLabels.indexOf(reservation.getPickUpDate().toString().split(" ")[0]);
 
             if (reservation.getStatus().equals(STATUS_COMPLETE)) {
-                completedReservationArray[index] = completedReservationArray[index] + 1;
+                completedReservationArray[index] = completedReservationArray[index] == null ? 1 : completedReservationArray[index] + 1;
             } else if (reservation.getStatus().equals(STATUS_RESERVATION_CANCELLED)) {
-                cancelledReservationArray[index] = cancelledReservationArray[index] + 1;
+                cancelledReservationArray[index] = cancelledReservationArray[index] == null ? 1 : cancelledReservationArray[index] + 1;
             } else if (reservation.getStatus().equals(STATUS_ACTIVE)) { // || reservation.getOnTrip()
                 activeReservationCount = activeReservationCount + 1;
             }
         }
+
+        cancelledReservationArray = Arrays.stream(cancelledReservationArray).map(i -> i == null ? 0 : i).toArray(Integer[]::new);
+        completedReservationArray = Arrays.stream(completedReservationArray).map(i -> i == null ? 0 : i).toArray(Integer[]::new);
 
         HashMap<String, Object> reservationStatsMap = new HashMap<>();
         reservationStatsMap.put("labels", lineChartLabels);
