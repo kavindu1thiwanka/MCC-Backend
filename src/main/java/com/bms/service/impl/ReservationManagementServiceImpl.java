@@ -136,7 +136,8 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         ReservationMst reservationMst = reservationMstOpt.get();
         reservationMst.setStatus(status);
         reservationMst.setUpdateOn(new Date());
-        reservationMst.setUpdateBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        reservationMst.setUpdateBy(user.getUsername());
         reservationMstRepository.save(reservationMst);
 
         return new ResponseEntity<>(HttpStatus.OK);

@@ -58,5 +58,6 @@ public class ReservationMst extends CommonBaseEntity implements Serializable {
         this.status = CommonConstants.STATUS_INACTIVE;
         this.paymentStatus = CommonConstants.STATUS_NOT_PAID;
         this.driverId = 0;
+        this.onTrip = false;
     }
 }
