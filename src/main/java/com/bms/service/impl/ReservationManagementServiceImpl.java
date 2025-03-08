@@ -163,7 +163,25 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      */
     @Override
     public ResponseEntity<Object> getReservationDetails(Integer reservationId) {
-        return new ResponseEntity<>(reservationMstRepository.getReservationDetailsById(reservationId), HttpStatus.OK);
+        ReservationDto reservationDto = reservationMstRepository.getReservationDetailsById(reservationId);
+
+        if (reservationDto == null) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        if (reservationDto.getUserId() != null) {
+            Optional<UserMst> customerOpt = userMstRepository.findById(reservationDto.getUserId());
+
+            customerOpt.ifPresent(reservationDto::setCustomerDetails);
+        }
+
+        if (Boolean.TRUE.equals(reservationDto.getNeedDriver())) {
+            Optional<UserMst> driverOpt = userMstRepository.findById(reservationDto.getDriverId());
+
+            driverOpt.ifPresent(reservationDto::setDriverDetails);
+        }
+
+        return new ResponseEntity<>(reservationDto, HttpStatus.OK);
     }
 
     /**
