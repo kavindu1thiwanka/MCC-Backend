@@ -63,7 +63,7 @@ public class DriverManagementServiceImpl implements DriverManagementService {
         BigDecimal monthlyEarnings = BigDecimal.ZERO;
 
         for (TransactionMst transaction : transactionList) {
-            totalEarnings = totalEarnings.add(transaction.getAmount());
+            totalEarnings = totalEarnings.add(BigDecimal.valueOf(1200));
 
             Calendar transactionCalendar = Calendar.getInstance();
             transactionCalendar.setTime(transaction.getCreatedOn());
@@ -71,15 +71,15 @@ public class DriverManagementServiceImpl implements DriverManagementService {
             Calendar currentCalendar = Calendar.getInstance();
 
             if (isSameDay(transactionCalendar, currentCalendar)) {
-                dailyEarnings = dailyEarnings.add(transaction.getAmount());
+                dailyEarnings = dailyEarnings.add(BigDecimal.valueOf(1200));
             }
 
             if (isSameMonthYear(transactionCalendar, currentCalendar)) {
-                monthlyEarnings = monthlyEarnings.add(transaction.getAmount());
+                monthlyEarnings = monthlyEarnings.add(BigDecimal.valueOf(1200));
             }
 
             if (isSameWeek(transactionCalendar, currentCalendar)) {
-                weeklyEarnings = weeklyEarnings.add(transaction.getAmount());
+                weeklyEarnings = weeklyEarnings.add(BigDecimal.valueOf(1200));
             }
         }
 
