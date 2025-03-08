@@ -114,10 +114,10 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     }
 
     /**
-     * This method is used to get reservation details
+     * This method is used to get logged-in user's reservation details
      */
     @Override
-    public ResponseEntity<Object> getReservationDetails() {
+    public ResponseEntity<Object> getLoggedInUserReservationDetails() {
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByCreatedUser(user.getUsername()), HttpStatus.OK);
     }
@@ -156,6 +156,14 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     @Override
     public ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException {
         return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByStatus(Arrays.asList(STATUS_COMPLETE, STATUS_RESERVATION_CANCELLED)), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to get reservation details of provided reservation id
+     */
+    @Override
+    public ResponseEntity<Object> getReservationDetails(Integer reservationId) {
+        return new ResponseEntity<>(reservationMstRepository.getReservationDetailsById(reservationId), HttpStatus.OK);
     }
 
     /**

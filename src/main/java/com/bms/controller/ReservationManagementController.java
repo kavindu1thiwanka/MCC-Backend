@@ -36,8 +36,8 @@ public class ReservationManagementController {
     }
 
     @GetMapping(GET_RESERVATION_DETAILS_V1)
-    public ResponseEntity<Object> getReservationDetails() throws BMSCheckedException {
-        return reservationManagementService.getReservationDetails();
+    public ResponseEntity<Object> getLoggedInUserReservationDetails() throws BMSCheckedException {
+        return reservationManagementService.getLoggedInUserReservationDetails();
     }
 
     @GetMapping(GET_ACTIVE_RESERVATION_DETAILS_V1)
@@ -48,6 +48,11 @@ public class ReservationManagementController {
     @GetMapping(GET_RESERVATION_HISTORY_DETAILS_V1)
     public ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException {
         return reservationManagementService.getReservationHistoryDetails();
+    }
+
+    @GetMapping(GET_RESERVATION_DETAILS_BY_ID_V1)
+    public ResponseEntity<Object> getReservationDetails(@RequestParam Integer reservationId) throws BMSCheckedException {
+        return reservationManagementService.getReservationDetails(reservationId);
     }
 
     @Autowired

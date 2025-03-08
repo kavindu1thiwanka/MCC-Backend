@@ -13,11 +13,13 @@ public interface ReservationManagementService {
 
     ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException;
 
-    ResponseEntity<Object> getReservationDetails();
+    ResponseEntity<Object> getLoggedInUserReservationDetails();
 
     ResponseEntity<Object> updateReservationStatus(Integer reservationId, Character status) throws BMSCheckedException;
 
     ResponseEntity<Object> getActiveReservationDetails() throws BMSCheckedException;
 
     ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException;
+
+    ResponseEntity<Object> getReservationDetails(Integer reservationId);
 }

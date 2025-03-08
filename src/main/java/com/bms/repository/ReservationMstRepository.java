@@ -39,4 +39,7 @@ public interface ReservationMstRepository extends JpaRepository<ReservationMst, 
 
     @Query("SELECT res FROM ReservationMst res WHERE res.status IN (:statusActive) ORDER BY res.createdOn DESC")
     List<ReservationMst> getReservationDetailsByStatus(List<Character> statusActive);
+
+    @Query("SELECT res FROM ReservationMst res WHERE res.id = :reservationId")
+    ReservationMst getReservationDetailsById(@Param("reservationId") Integer reservationId);
 }
