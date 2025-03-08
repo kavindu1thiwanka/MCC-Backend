@@ -55,6 +55,11 @@ public class ReservationManagementController {
         return reservationManagementService.getReservationDetails(reservationId);
     }
 
+    @PutMapping(CHANGE_ON_TRIP_STATUS_V1)
+    public ResponseEntity<Object> changeOnTripStatus(@RequestParam Integer reservationId) throws BMSCheckedException {
+        return reservationManagementService.changeOnTripStatus(reservationId);
+    }
+
     @Autowired
     public void setReservationManagementService(ReservationManagementService reservationManagementService) {
         this.reservationManagementService = reservationManagementService;

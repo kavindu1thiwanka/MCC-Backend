@@ -22,4 +22,6 @@ public interface ReservationManagementService {
     ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException;
 
     ResponseEntity<Object> getReservationDetails(Integer reservationId);
+
+    ResponseEntity<Object> changeOnTripStatus(Integer reservationId) throws BMSCheckedException;
 }

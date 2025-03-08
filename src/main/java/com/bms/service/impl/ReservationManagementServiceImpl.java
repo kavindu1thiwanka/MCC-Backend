@@ -135,6 +135,9 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
 
         ReservationMst reservationMst = reservationMstOpt.get();
         reservationMst.setStatus(status);
+        if (status.equals(STATUS_COMPLETE)) {
+            reservationMst.setOnTrip(Boolean.FALSE);
+        }
         reservationMst.setUpdateOn(new Date());
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         reservationMst.setUpdateBy(user.getUsername());
@@ -183,6 +186,28 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         }
 
         return new ResponseEntity<>(reservationDto, HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to update onTrip status
+     */
+    @Override
+    public ResponseEntity<Object> changeOnTripStatus(Integer reservationId) throws BMSCheckedException {
+
+        Optional<ReservationMst> reservationMstOpt = reservationMstRepository.findById(reservationId);
+
+        if (reservationMstOpt.isEmpty()) {
+            throw new BMSCheckedException(RESERVATION_NOT_FOUND);
+        }
+
+        ReservationMst reservationMst = reservationMstOpt.get();
+        reservationMst.setOnTrip(Boolean.TRUE);
+        reservationMst.setUpdateOn(new Date());
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        reservationMst.setUpdateBy(user.getUsername());
+        reservationMstRepository.save(reservationMst);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
