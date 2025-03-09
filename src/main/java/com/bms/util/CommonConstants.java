@@ -66,6 +66,7 @@ public abstract class CommonConstants {
     public static final Integer EMAIL_TEMPLATE_CONFIGURE_USER = 1;
     public static final Integer EMAIL_TEMPLATE_REGISTRATION_SUCCESS = 2;
     public static final Integer EMAIL_TEMPLATE_PWD_RESET = 3;
+    public static final Integer EMAIL_TEMPLATE_RESERVATION_SUCCESSFUL = 4;
 
     // Params
     public static final String PARAM_EMAIL_SEND_TO = "EMAIL_SEND_TO";
@@ -76,6 +77,13 @@ public abstract class CommonConstants {
     public static final String PARAM_ID = "PARAM_ID";
     public static final String PARAM_USERNAME = "USERNAME";
     public static final String PARAM_PWD_RESET_TOKEN = "PWD_RESET_TOKEN";
+    public static final String PARAM_RESERVATION_ID = "RESERVATION_ID";
+    public static final String PARAM_VEHICLE_MODEL = "VEHICLE_MODEL";
+    public static final String PARAM_PICKUP_LOCATION = "PICKUP_LOCATION";
+    public static final String PARAM_DROPOFF_LOCATION = "DROPOFF_LOCATION";
+    public static final String PARAM_PICKUP_DATE = "PICKUP_DATE";
+    public static final String PARAM_DROPOFF_DATE = "DROPOFF_DATE";
+    public static final String PARAM_TOTAL_PRICE = "TOTAL_PRICE";
 
     // SQL Query Constants
     public static final String SQL_AND = "AND";

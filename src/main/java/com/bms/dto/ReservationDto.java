@@ -26,6 +26,7 @@ public class ReservationDto {
     private Boolean onTrip = Boolean.FALSE;
     private Character paymentStatus;
     private Character status;
+    private String vehicleModel;
 
     private UserMst customerDetails = null;
     private UserMst driverDetails = null;

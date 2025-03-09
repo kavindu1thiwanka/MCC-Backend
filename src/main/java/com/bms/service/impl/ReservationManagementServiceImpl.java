@@ -1,23 +1,26 @@
 package com.bms.service.impl;
 
 import com.bms.dto.ReservationDto;
-import com.bms.entity.ReservationMst;
-import com.bms.entity.TransactionMst;
-import com.bms.entity.UserMst;
-import com.bms.repository.ReservationMstRepository;
-import com.bms.repository.TransactionMstRepository;
-import com.bms.repository.UserMstRepository;
+import com.bms.entity.*;
+import com.bms.repository.*;
+import com.bms.service.EmailService;
+import com.bms.service.InvoiceService;
 import com.bms.service.ReservationManagementService;
 import com.bms.service.StripeService;
 import com.bms.util.BMSCheckedException;
 import com.stripe.exception.StripeException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static com.bms.util.CommonConstants.*;
@@ -29,8 +32,12 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     private ReservationMstRepository reservationMstRepository;
     private UserMstRepository userMstRepository;
     private TransactionMstRepository transactionMstRepository;
-
+    private EmailService emailService;
     private StripeService stripeService;
+    private CommonEmailTemplateRepository commonEmailTemplateRepository;
+    private VehicleMstRepository vehicleMstRepository;
+    private CommonEmailMstRepository commonEmailMstRepository;
+    private InvoiceService invoiceService;
 
     /**
      * This method is used to create new reservation
@@ -110,7 +117,72 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         reservationMst.setUpdateBy(user.getUsername());
         reservationMstRepository.save(reservationMst);
 
+        if (reservationMst.getStatus().equals(STATUS_ACTIVE)) {
+            sendReservationSuccessEmail(reservationMst, transactionMst.getAmount());
+        }
+
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to send reservation success email
+     */
+    @Async
+    public void sendReservationSuccessEmail(ReservationMst reservationMst, BigDecimal amount) throws BMSCheckedException {
+
+        ReservationDto reservationDto = new ReservationDto(reservationMst);
+        reservationDto.setTotalCost(amount);
+        reservationDto.setCustomerDetails(userMstRepository.findById(reservationMst.getUserId()).get());
+        if (reservationMst.getDriverId() != null) {
+            reservationDto.setDriverDetails(userMstRepository.findById(reservationMst.getDriverId()).get());
+        }
+        reservationDto.setVehicleModel(vehicleMstRepository.getVehicleModelByVehicleNumber(reservationMst.getVehicleNo()));
+
+        Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_RESERVATION_SUCCESSFUL);
+
+        if (templateOpt.isEmpty()) {
+            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+        }
+
+        CommonEmailTemplate emailTemplate = templateOpt.get();
+
+        Document html = Jsoup.parse(emailTemplate.getTemplateData(), CHARACTER_TYPE);
+
+        Element emailSendToElement = html.body().getElementById(PARAM_EMAIL_SEND_TO);
+        emailSendToElement.html(reservationDto.getCustomerDetails().getFirstName().concat(EMPTY_SPACE_STRING).concat(reservationDto.getCustomerDetails().getLastName() == null ? EMPTY_STRING : reservationDto.getCustomerDetails().getLastName()));
+
+        Element reservationIdElement = html.body().getElementById(PARAM_RESERVATION_ID);
+        reservationIdElement.html("#" + reservationMst.getId());
+
+        Element vehicleModelElement = html.body().getElementById(PARAM_VEHICLE_MODEL);
+        vehicleModelElement.html(reservationDto.getVehicleModel());
+
+        Element pickUpLocationElement = html.body().getElementById(PARAM_PICKUP_LOCATION);
+        pickUpLocationElement.html(reservationDto.getPickUpLocation());
+
+        Element dropOffLocationElement = html.body().getElementById(PARAM_DROPOFF_LOCATION);
+        dropOffLocationElement.html(reservationDto.getReturnLocation());
+
+        Element pickupDateElement = html.body().getElementById(PARAM_PICKUP_DATE);
+        pickupDateElement.html(String.valueOf(reservationDto.getPickUpDate()));
+
+        Element dropOffDateElement = html.body().getElementById(PARAM_DROPOFF_DATE);
+        dropOffDateElement.html(String.valueOf(reservationDto.getReturnDate()));
+
+        Element totalPriceElement = html.body().getElementById(PARAM_TOTAL_PRICE);
+        totalPriceElement.html(amount.toString());
+
+        CommonEmailMst email = new CommonEmailMst();
+        email.setSendTo(reservationDto.getCustomerDetails().getEmail());
+        email.setSubject(emailTemplate.getSubject());
+        email.setContent(html.html());
+        email.setStatus(STATUS_INACTIVE);
+        commonEmailMstRepository.save(email);
+
+        byte[] invoiceBytes = invoiceService.generateInvoice(reservationDto);
+
+        emailService.sendEmailWithAttachment(email.getId(), invoiceBytes);
+
     }
 
     /**
@@ -273,5 +345,30 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     @Autowired
     public void setStripeService(StripeService stripeService) {
         this.stripeService = stripeService;
+    }
+
+    @Autowired
+    public void setEmailService(EmailService emailService) {
+        this.emailService = emailService;
+    }
+
+    @Autowired
+    public void setCommonEmailTemplateRepository(CommonEmailTemplateRepository commonEmailTemplateRepository) {
+        this.commonEmailTemplateRepository = commonEmailTemplateRepository;
+    }
+
+    @Autowired
+    public void setVehicleMstRepository(VehicleMstRepository vehicleMstRepository) {
+        this.vehicleMstRepository = vehicleMstRepository;
+    }
+
+    @Autowired
+    public void setCommonEmailMstRepository(CommonEmailMstRepository commonEmailMstRepository) {
+        this.commonEmailMstRepository = commonEmailMstRepository;
+    }
+
+    @Autowired
+    public void setInvoiceService(InvoiceService invoiceService) {
+        this.invoiceService = invoiceService;
     }
 }
