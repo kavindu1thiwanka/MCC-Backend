@@ -92,7 +92,7 @@ public class ReportServiceImpl implements ReportService {
 
             // Adjust column widths for landscape mode
             float[] columnWidths = {80, 90, 150, 80, 150, 150, 130, 130, 80, 80};
-            String[] headers = {"ID", "Vehicle No", "Customer Name", "Customer Id", "Pickup Location", "Drop-off Location", "Pickup Date", "Drop-off Date", "Total Price", "Status"};
+            String[] headers = {"ID", "Vehicle No", "Customer Name", "Customer ID", "Pickup Location", "Drop-off Location", "Pickup Date", "Drop-off Date", "Total Price", "Status"};
 
             // Draw table header
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
@@ -170,16 +170,29 @@ public class ReportServiceImpl implements ReportService {
 
             Sheet sheet = workbook.createSheet("Reservations");
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Reservation ID");
-            headerRow.createCell(1).setCellValue("Customer");
-            headerRow.createCell(2).setCellValue("Vehicle");
-
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Vehicle No");
+            headerRow.createCell(2).setCellValue("Customer Name");
+            headerRow.createCell(3).setCellValue("Customer ID");
+            headerRow.createCell(4).setCellValue("Pickup Location");
+            headerRow.createCell(5).setCellValue("Drop-off Location");
+            headerRow.createCell(6).setCellValue("Pickup Date");
+            headerRow.createCell(7).setCellValue("Drop-off Date");
+            headerRow.createCell(8).setCellValue("Total Price");
+            headerRow.createCell(9).setCellValue("Status");
             int rowIdx = 1;
             for (ReservationDto reservation : reservations) {
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(reservation.getId());
-//                row.createCell(1).setCellValue(reservation.getCustomer().getFullName());
-//                row.createCell(2).setCellValue(reservation.getVehicle().getModel());
+                row.createCell(0).setCellValue("#" + reservation.getId());
+                row.createCell(1).setCellValue(reservation.getVehicleNo());
+                row.createCell(2).setCellValue(reservation.getCustomerDetails().getFirstName() + " " + reservation.getCustomerDetails().getLastName());
+                row.createCell(3).setCellValue(String.valueOf(reservation.getCustomerDetails().getId()));
+                row.createCell(4).setCellValue(reservation.getPickUpLocation());
+                row.createCell(5).setCellValue(reservation.getReturnLocation());
+                row.createCell(6).setCellValue(reservation.getPickUpDate().toString());
+                row.createCell(7).setCellValue(reservation.getReturnDate().toString());
+                row.createCell(8).setCellValue(String.valueOf(reservation.getTotalCost()));
+                row.createCell(9).setCellValue(reservation.getStatus().equals(STATUS_COMPLETE) ? "Completed" : "Cancelled");
             }
 
             workbook.write(outputStream);
