@@ -12,6 +12,7 @@ public abstract class Mappings {
     public static final String VEHICLE = "/vehicle";
     public static final String RESERVATION = "/res";
     public static final String PAYMENTS = "/payments";
+    public static final String REPORT = "/report";
 
     // Version Mappings
     public static final String VERSION_V1 = "/v1";
@@ -80,4 +81,7 @@ public abstract class Mappings {
     public static final String UPDATE_ONLINE_STATUS_V1 = VERSION_V1 + "/update_online_status";
     public static final String GET_ONLINE_STATUS_V1 = VERSION_V1 + "/get_dashboard_details";
     public static final String GET_RIDES_HISTORY_V1 = VERSION_V1 + "/get_rides_history";
+
+    // Report Management Mappings
+    public static final String GENERATE_REPORT = VERSION_V1 + "/generate";
 }

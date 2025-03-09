@@ -43,4 +43,14 @@ public interface ReservationMstRepository extends JpaRepository<ReservationMst, 
 
     @Query("SELECT new com.bms.dto.ReservationDto(res) FROM ReservationMst res WHERE res.id = :reservationId")
     ReservationDto getReservationDetailsById(@Param("reservationId") Integer reservationId);
+
+    @Query("SELECT new com.bms.dto.ReservationDto(res, usr, veh, tran.amount) FROM ReservationMst res INNER JOIN UserMst usr ON res.userId = usr.id " +
+            "INNER JOIN VehicleMst veh ON res.vehicleNo = veh.vehicleNo INNER JOIN TransactionMst tran ON res.id = tran.reservationId " +
+            "WHERE res.pickUpDate BETWEEN :startDate AND :endDate AND res.status = '" + STATUS_COMPLETE + "'")
+    List<ReservationDto> getReservationDetailsByDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query("SELECT new com.bms.dto.ReservationDto(res, usr, veh, tran.amount) FROM ReservationMst res INNER JOIN UserMst usr ON res.userId = usr.id " +
+            "INNER JOIN VehicleMst veh ON res.vehicleNo = veh.vehicleNo INNER JOIN TransactionMst tran ON res.id = tran.reservationId " +
+            "WHERE res.status = '" + STATUS_COMPLETE + "'")
+    List<ReservationDto> getReservationDetails();
 }

@@ -1,10 +1,12 @@
 package com.bms.service;
 
+import com.bms.dto.ReportDto;
 import com.bms.dto.ReservationDto;
 import com.bms.util.BMSCheckedException;
 import com.stripe.exception.StripeException;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ReservationManagementService {
@@ -24,4 +26,6 @@ public interface ReservationManagementService {
     ResponseEntity<Object> getReservationDetails(Integer reservationId);
 
     ResponseEntity<Object> changeOnTripStatus(Integer reservationId) throws BMSCheckedException;
+
+    List<ReservationDto> getReservationDetailsList(ReportDto reportData);
 }

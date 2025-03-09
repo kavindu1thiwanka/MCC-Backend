@@ -1,7 +1,9 @@
 package com.bms.dto;
 
 import com.bms.entity.ReservationMst;
+import com.bms.entity.TransactionMst;
 import com.bms.entity.UserMst;
+import com.bms.entity.VehicleMst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -44,5 +46,19 @@ public class ReservationDto {
         this.onTrip = mst.getOnTrip();
         this.paymentStatus = mst.getPaymentStatus();
         this.status = mst.getStatus();
+    }
+
+    public ReservationDto(ReservationMst mst, UserMst customer, VehicleMst vehicle, BigDecimal amount) {
+        this.id = mst.getId();
+        this.vehicleNo = vehicle.getVehicleNo();
+        this.vehicleModel = vehicle.getVehicleModel();
+        this.pickUpDate = mst.getPickUpDate();
+        this.returnDate = mst.getReturnDate();
+        this.pickUpLocation = mst.getPickUpLocation();
+        this.returnLocation = mst.getReturnLocation();
+        this.userId = mst.getUserId();
+        this.needDriver = mst.getDriverId() != null && mst.getDriverId() != 0;
+        this.totalCost = amount;
+        this.customerDetails = customer;
     }
 }

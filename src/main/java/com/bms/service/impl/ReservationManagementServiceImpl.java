@@ -1,5 +1,6 @@
 package com.bms.service.impl;
 
+import com.bms.dto.ReportDto;
 import com.bms.dto.ReservationDto;
 import com.bms.entity.*;
 import com.bms.repository.*;
@@ -280,6 +281,16 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         reservationMstRepository.save(reservationMst);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public List<ReservationDto> getReservationDetailsList(ReportDto reportData) {
+
+        if (reportData.getStartDate() == null || reportData.getEndDate() == null) {
+            return reservationMstRepository.getReservationDetails();
+        }
+
+        return reservationMstRepository.getReservationDetailsByDate(reportData.getStartDate(), reportData.getEndDate());
     }
 
     /**
