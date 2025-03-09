@@ -293,6 +293,16 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         return reservationMstRepository.getReservationDetailsByDate(reportData.getStartDate(), reportData.getEndDate());
     }
 
+    @Override
+    public List<TransactionMst> getTransactionDetailsList(ReportDto reportData) {
+
+        if (reportData.getStartDate() == null || reportData.getEndDate() == null) {
+            return transactionMstRepository.getTransactionDetails();
+        }
+
+        return transactionMstRepository.getTransactionDetailsByDate(reportData.getStartDate(), reportData.getEndDate());
+    }
+
     /**
      * This method is used to set driver id
      */
