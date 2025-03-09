@@ -60,5 +60,6 @@ public class ReservationDto {
         this.needDriver = mst.getDriverId() != null && mst.getDriverId() != 0;
         this.totalCost = amount;
         this.customerDetails = customer;
+        this.status = mst.getStatus();
     }
 }

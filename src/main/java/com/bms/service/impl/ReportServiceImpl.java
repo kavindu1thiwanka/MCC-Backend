@@ -19,9 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+
+import static com.bms.util.CommonConstants.STATUS_COMPLETE;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -71,34 +74,95 @@ public class ReportServiceImpl implements ReportService {
         try (PDDocument document = new PDDocument();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
-            PDPage page = new PDPage(PDRectangle.A4);
+            PDPage page = new PDPage(new PDRectangle(PDRectangle.A3.getHeight(), PDRectangle.A3.getWidth()));
             document.addPage(page);
 
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
-                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 16);
-                contentStream.beginText();
-                contentStream.newLineAtOffset(200, 750);
-                contentStream.showText("Reservations Report");
-                contentStream.endText();
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 16);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(500, 750);
+            contentStream.showText("Reservations Report");
+            contentStream.endText();
 
-                float yPosition = 700;
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
+            float margin = 50;
+            float yStart = 750 - margin;
+            float tableWidth = page.getMediaBox().getWidth() - 2 * margin;
+            float yPosition = yStart;
+            float rowHeight = 20;
 
-                for (ReservationDto reservation : reservations) {
-                    contentStream.beginText();
-                    contentStream.newLineAtOffset(50, yPosition);
-                    contentStream.showText("Reservation ID: " + reservation.getId() + " | Customer: " +" reservation.getCustomer().getFullName()");
-                    contentStream.endText();
-                    yPosition -= 20;
+            // Adjust column widths for landscape mode
+            float[] columnWidths = {80, 90, 150, 80, 150, 150, 130, 130, 80, 80};
+            String[] headers = {"ID", "Vehicle No", "Customer Name", "Customer Id", "Pickup Location", "Drop-off Location", "Pickup Date", "Drop-off Date", "Total Price", "Status"};
+
+            // Draw table header
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+            yPosition -= rowHeight;
+            drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, headers);
+
+            // Draw table rows
+            contentStream.setFont(PDType1Font.HELVETICA, 8);
+            for (ReservationDto reservation : reservations) {
+                if (yPosition < 50) {
+                    contentStream.close();
+                    page = new PDPage(new PDRectangle(PDRectangle.A4.getHeight(), PDRectangle.A4.getWidth()));
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    yPosition = yStart - rowHeight;
+                    contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+                    drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, headers);
+                    contentStream.setFont(PDType1Font.HELVETICA, 8);
                 }
+
+                yPosition -= rowHeight;
+                String[] rowData = {
+                        "#" + reservation.getId(),
+                        reservation.getVehicleNo(),
+                        reservation.getCustomerDetails().getFirstName() + " " + reservation.getCustomerDetails().getLastName(),
+                        String.valueOf(reservation.getCustomerDetails().getId()),
+                        reservation.getPickUpLocation(),
+                        reservation.getReturnLocation(),
+                        reservation.getPickUpDate().toString(),
+                        reservation.getReturnDate().toString(),
+                        String.valueOf(reservation.getTotalCost()),
+                        reservation.getStatus().equals(STATUS_COMPLETE) ? "Completed" : "Cancelled"
+                };
+                drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, rowData);
             }
 
+            contentStream.close();
             document.save(outputStream);
             return outputStream.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("Error generating reservations PDF", e);
         }
     }
+
+
+    /**
+     * Draws a table row with data.
+     */
+    private void drawTableRow(PDPageContentStream contentStream, float y, float margin, float tableWidth, float[] columnWidths, String[] data) throws IOException {
+        float x = margin;
+        float cellHeight = 20;
+
+        // Draw cell background and text
+        for (int i = 0; i < data.length; i++) {
+            // Draw cell border
+            contentStream.setStrokingColor(Color.BLACK);
+            contentStream.addRect(x, y, columnWidths[i], cellHeight);
+            contentStream.stroke();
+
+            // Add text inside the cell
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 10);
+            contentStream.newLineAtOffset(x + 5, y + 5);
+            contentStream.showText(data[i]);
+            contentStream.endText();
+
+            x += columnWidths[i];
+        }
+    }
+
 
     private byte[] generateReservationsExcel(List<ReservationDto> reservations) {
         try (Workbook workbook = new XSSFWorkbook();
