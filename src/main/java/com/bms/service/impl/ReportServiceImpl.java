@@ -52,6 +52,10 @@ public class ReportServiceImpl implements ReportService {
 
         List<ReservationDto> reservationDetailsList = reservationManagementService.getReservationDetailsList(reportData);
 
+        if (reservationDetailsList.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
         if (reportData.getFileFormat().equals("pdf")) {
             reportData.setFileContent(generateReservationsPdf(reservationDetailsList));
         } else {
