@@ -1,7 +1,7 @@
 package com.bms.service;
 
 import com.bms.dto.AuthRequestDto;
-import com.bms.util.BMSCheckedException;
+import com.bms.exception.BusinessException;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthService {
@@ -10,5 +10,5 @@ public interface AuthService {
 
     ResponseEntity<Object> refreshToken(AuthRequestDto request);
 
-    ResponseEntity<Object> sendPasswordResetMail(String email) throws BMSCheckedException;
+    ResponseEntity<Object> sendPasswordResetMail(String email) throws BusinessException;
 }

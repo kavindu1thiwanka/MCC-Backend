@@ -3,11 +3,11 @@ package com.bms.service.impl;
 import com.bms.entity.ReservationMst;
 import com.bms.entity.TransactionMst;
 import com.bms.entity.UserMst;
+import com.bms.exception.BusinessException;
 import com.bms.repository.ReservationMstRepository;
 import com.bms.repository.TransactionMstRepository;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.DriverManagementService;
-import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +32,12 @@ public class DriverManagementServiceImpl implements DriverManagementService {
      * This method is used to update driver online status
      */
     @Override
-    public ResponseEntity<Object> updateOnlineStatus(Boolean isOnline) throws BMSCheckedException {
+    public ResponseEntity<Object> updateOnlineStatus(Boolean isOnline) throws BusinessException {
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<UserMst> userOpt = userMstRepository.findById(user.getId());
 
         if (userOpt.isEmpty()) {
-            throw new BMSCheckedException(USER_NOT_FOUND);
+            throw new BusinessException(USER_NOT_FOUND);
         }
 
         UserMst userMst = userOpt.get();

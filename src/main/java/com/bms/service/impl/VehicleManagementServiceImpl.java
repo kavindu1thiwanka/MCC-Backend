@@ -6,12 +6,12 @@ import com.bms.dto.VehicleMstDto;
 import com.bms.entity.ReservationMst;
 import com.bms.entity.UserMst;
 import com.bms.entity.VehicleMst;
+import com.bms.exception.BusinessException;
 import com.bms.repository.ReservationMstRepository;
 import com.bms.repository.VehicleManagementCustomRepository;
 import com.bms.repository.VehicleMstRepository;
 import com.bms.service.FileStorageService;
 import com.bms.service.VehicleManagementService;
-import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,34 +44,36 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Override
     public ResponseEntity<Object> getVehicleList(CommonFilterDto commonFilterDto) {
 
-        List<VehicleMstDto> vehicleList = vehicleManagementCustomRepository.getVehicleList(commonFilterDto);
-        HashMap<String, List<ReservationMst>> reservationMap = getReservationMap(commonFilterDto.getCategory());
+        throw new BusinessException("Exception Check");
 
-        List<VehicleMstDto> availableVehicleList = new ArrayList<>();
-
-        for (VehicleMstDto vehicle : vehicleList) {
-            if (!reservationMap.containsKey(vehicle.getVehicleNo())) {
-                availableVehicleList.add(vehicle);
-                continue;
-            }
-
-            boolean unavailable = false;
-            for (ReservationMst reservation : reservationMap.get(vehicle.getVehicleNo())) {
-
-                unavailable = (commonFilterDto.getPickUpDate().after(reservation.getPickUpDate())
-                        && commonFilterDto.getPickUpDate().before(reservation.getReturnDate()))
-                        || (commonFilterDto.getReturnDate().after(reservation.getPickUpDate())
-                        && commonFilterDto.getReturnDate().before(reservation.getReturnDate()));
-
-                if (unavailable) {
-                    break;
-                }
-            }
-            if (!unavailable) {
-                availableVehicleList.add(vehicle);
-            }
-        }
-        return new ResponseEntity<>(availableVehicleList, HttpStatus.OK);
+//        List<VehicleMstDto> vehicleList = vehicleManagementCustomRepository.getVehicleList(commonFilterDto);
+//        HashMap<String, List<ReservationMst>> reservationMap = getReservationMap(commonFilterDto.getCategory());
+//
+//        List<VehicleMstDto> availableVehicleList = new ArrayList<>();
+//
+//        for (VehicleMstDto vehicle : vehicleList) {
+//            if (!reservationMap.containsKey(vehicle.getVehicleNo())) {
+//                availableVehicleList.add(vehicle);
+//                continue;
+//            }
+//
+//            boolean unavailable = false;
+//            for (ReservationMst reservation : reservationMap.get(vehicle.getVehicleNo())) {
+//
+//                unavailable = (commonFilterDto.getPickUpDate().after(reservation.getPickUpDate())
+//                        && commonFilterDto.getPickUpDate().before(reservation.getReturnDate()))
+//                        || (commonFilterDto.getReturnDate().after(reservation.getPickUpDate())
+//                        && commonFilterDto.getReturnDate().before(reservation.getReturnDate()));
+//
+//                if (unavailable) {
+//                    break;
+//                }
+//            }
+//            if (!unavailable) {
+//                availableVehicleList.add(vehicle);
+//            }
+//        }
+//        return new ResponseEntity<>(availableVehicleList, HttpStatus.OK);
     }
 
     private HashMap<String, List<ReservationMst>> getReservationMap(String category) {
@@ -98,7 +100,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BusinessException, IOException {
 
         validateVehicleDetails(vehicleMstDto);
 
@@ -125,36 +127,36 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    private void validateVehicleDetails(VehicleMstDto vehicleMstDto) throws BMSCheckedException {
+    private void validateVehicleDetails(VehicleMstDto vehicleMstDto) throws BusinessException {
 
         if (vehicleMstDto == null) {
-            throw new BMSCheckedException(VEHICLE_DETAILS_CANNOT_BE_NULL);
+            throw new BusinessException(VEHICLE_DETAILS_CANNOT_BE_NULL);
         }
 
         if (vehicleMstDto.getVehicleNo() == null || vehicleMstDto.getVehicleNo().isEmpty()) {
-            throw new BMSCheckedException(VEHICLE_NO_CANNOT_BE_EMPTY);
+            throw new BusinessException(VEHICLE_NO_CANNOT_BE_EMPTY);
         } else if (vehicleMstRepository.existsByVehicleNo(vehicleMstDto.getVehicleNo())) {
-            throw new BMSCheckedException(VEHICLE_ALREADY_EXISTS);
+            throw new BusinessException(VEHICLE_ALREADY_EXISTS);
         }
 
         if (vehicleMstDto.getName() == null || vehicleMstDto.getName().isEmpty()) {
-            throw new BMSCheckedException(VEHICLE_NAME_CANNOT_BE_EMPTY);
+            throw new BusinessException(VEHICLE_NAME_CANNOT_BE_EMPTY);
         }
 
         if (vehicleMstDto.getVehicleType() == null || vehicleMstDto.getVehicleType().isEmpty()) {
-            throw new BMSCheckedException(VEHICLE_TYPE_CANNOT_BE_EMPTY);
+            throw new BusinessException(VEHICLE_TYPE_CANNOT_BE_EMPTY);
         }
 
         if (vehicleMstDto.getSeats() == null) {
-            throw new BMSCheckedException(SEATS_AMOUNT_CANNOT_BE_NULL);
+            throw new BusinessException(SEATS_AMOUNT_CANNOT_BE_NULL);
         }
 
         if (vehicleMstDto.getGearType() == null) {
-            throw new BMSCheckedException(GEAR_TYPE_CANNOT_BE_EMPTY);
+            throw new BusinessException(GEAR_TYPE_CANNOT_BE_EMPTY);
         }
 
         if (vehicleMstDto.getPricePerDay() == null) {
-            throw new BMSCheckedException(PRICE_PER_DAY_CANNOT_BE_NULL);
+            throw new BusinessException(PRICE_PER_DAY_CANNOT_BE_NULL);
         }
     }
 
@@ -190,7 +192,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BusinessException, IOException {
 
         VehicleMst existingVehicle = getExistingVehicle(vehicleMstDto.getVehicleNo());
 
@@ -215,7 +217,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> updateVehicleStatus(String vehicleNumber, Character status) throws BMSCheckedException {
+    public ResponseEntity<Object> updateVehicleStatus(String vehicleNumber, Character status) throws BusinessException {
 
         VehicleMst existingVehicle = getExistingVehicle(vehicleNumber);
         existingVehicle.setStatus(status);
@@ -236,11 +238,11 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
      * This method is used to get vehicle details
      */
     @Override
-    public ResponseEntity<Object> getVehicleDetails(String vehicleNumber) throws BMSCheckedException {
+    public ResponseEntity<Object> getVehicleDetails(String vehicleNumber) throws BusinessException {
         Optional<VehicleMst> vehicleOpt = vehicleMstRepository.findByVehicleNo(vehicleNumber);
 
         if (vehicleOpt.isEmpty()) {
-            throw new BMSCheckedException(VEHICLE_NOT_FOUND);
+            throw new BusinessException(VEHICLE_NOT_FOUND);
         }
 
         return new ResponseEntity<>(vehicleOpt.get(), HttpStatus.OK);
@@ -249,11 +251,11 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     /**
      * This method is used to get existing vehicle details
      */
-    private VehicleMst getExistingVehicle(String vehicleNumber) throws BMSCheckedException {
+    private VehicleMst getExistingVehicle(String vehicleNumber) throws BusinessException {
         Optional<VehicleMst> vehicleOpt = vehicleMstRepository.findByVehicleNo(vehicleNumber);
 
         if (vehicleOpt.isEmpty()) {
-            throw new BMSCheckedException(VEHICLE_NOT_FOUND);
+            throw new BusinessException(VEHICLE_NOT_FOUND);
         }
 
         return vehicleOpt.get();

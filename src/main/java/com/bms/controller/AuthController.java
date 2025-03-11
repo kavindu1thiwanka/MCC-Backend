@@ -1,8 +1,8 @@
 package com.bms.controller;
 
 import com.bms.dto.AuthRequestDto;
+import com.bms.exception.BusinessException;
 import com.bms.service.AuthService;
-import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping(SEND_PASSWORD_RESET_MAIL_V1)
-    public ResponseEntity<Object> sendPasswordResetMail(@RequestParam String email) throws BMSCheckedException {
+    public ResponseEntity<Object> sendPasswordResetMail(@RequestParam String email) throws BusinessException {
         return authService.sendPasswordResetMail(email);
     }
 

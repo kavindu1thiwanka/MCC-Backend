@@ -1,11 +1,12 @@
 package com.bms.service.impl;
 
+import com.bms.exception.BusinessException;
 import com.bms.service.FileStorageService;
-import com.bms.util.BMSCheckedException;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,14 +53,14 @@ public class FileStorageServiceImpl implements FileStorageService {
      * @param vehicleNo vehicle number
      */
     @Override
-    public String uploadVehicleImage(MultipartFile file, String vehicleNo, String existingImage) throws IOException, BMSCheckedException {
+    public String uploadVehicleImage(MultipartFile file, String vehicleNo, String existingImage) throws IOException, BusinessException {
 
         if (existingImage != null && !existingImage.isEmpty()) {
             try {
                 BlobId blobId = BlobId.of(bucketName, existingImage);
                 storage.delete(blobId);
             } catch (Exception e) {
-                throw new BMSCheckedException("Error deleting file: " + existingImage, e);
+                throw new BusinessException("Error deleting file: " + HttpStatus.EXPECTATION_FAILED);
             }
         }
 
@@ -78,14 +79,14 @@ public class FileStorageServiceImpl implements FileStorageService {
      * This method is used to upload driver license to Google Cloud Storage
      */
     @Override
-    public String uploadDriverLicense(MultipartFile file, String driverLicenseNo, String existingDrivingImage) throws IOException, BMSCheckedException {
+    public String uploadDriverLicense(MultipartFile file, String driverLicenseNo, String existingDrivingImage) throws IOException, BusinessException {
 
         if (existingDrivingImage != null && !existingDrivingImage.isEmpty()) {
             try {
                 BlobId blobId = BlobId.of(bucketName, existingDrivingImage);
                 storage.delete(blobId);
             } catch (Exception e) {
-                throw new BMSCheckedException("Error deleting file: " + existingDrivingImage, e);
+                throw new BusinessException("Error deleting file: " + existingDrivingImage, HttpStatus.EXPECTATION_FAILED);
             }
         }
 

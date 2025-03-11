@@ -5,11 +5,11 @@ import com.bms.dto.AuthRequestDto;
 import com.bms.entity.CommonEmailMst;
 import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
+import com.bms.exception.BusinessException;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.repository.CommonEmailTemplateRepository;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.AuthService;
-import com.bms.util.BMSCheckedException;
 import com.bms.util.ExceptionMessages;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -102,12 +102,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> sendPasswordResetMail(String email) throws BMSCheckedException {
+    public ResponseEntity<Object> sendPasswordResetMail(String email) throws BusinessException {
 
         Optional<UserMst> userOpt = userMstRepository.findByEmailAndStatusNot(email, STATUS_DELETE);
 
         if (userOpt.isEmpty()) {
-            throw new BMSCheckedException(ExceptionMessages.USER_NOT_FOUND);
+            throw new BusinessException(ExceptionMessages.USER_NOT_FOUND);
         }
 
         UserMst user = userOpt.get();
@@ -119,11 +119,11 @@ public class AuthServiceImpl implements AuthService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void sendPasswordResetEmail(UserMst user, String resetToken) throws BMSCheckedException {
+    private void sendPasswordResetEmail(UserMst user, String resetToken) throws BusinessException {
         Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_PWD_RESET);
 
         if (templateOpt.isEmpty()) {
-            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+            throw new BusinessException(EMAIL_TEMPLATE_NOT_FOUND);
         }
 
         CommonEmailTemplate emailTemplate = templateOpt.get();

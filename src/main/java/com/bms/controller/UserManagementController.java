@@ -2,13 +2,12 @@ package com.bms.controller;
 
 import com.bms.dto.AddressDto;
 import com.bms.dto.UserDto;
+import com.bms.exception.BusinessException;
 import com.bms.service.UserManagementService;
-import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,27 +22,27 @@ public class UserManagementController {
     private UserManagementService userManagementService;
 
     @PostMapping(REGISTER_USER_V1)
-    public ResponseEntity<Object> registerUser(@RequestBody UserDto user) throws BMSCheckedException {
+    public ResponseEntity<Object> registerUser(@RequestBody UserDto user) throws BusinessException {
         return userManagementService.registerUser(user);
     }
 
     @PostMapping(CREATE_USER_V1)
-    public ResponseEntity<Object> createUser(@ModelAttribute UserDto user) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> createUser(@ModelAttribute UserDto user) throws BusinessException, IOException {
         return userManagementService.createUser(user);
     }
 
     @GetMapping(CONFIRM_USER_EMAIL_V1)
-    public ResponseEntity<Object> confirmUserEmail(@RequestParam String uuid) throws BMSCheckedException {
+    public ResponseEntity<Object> confirmUserEmail(@RequestParam String uuid) throws BusinessException {
         return userManagementService.confirmUserEmail(uuid);
     }
 
     @PutMapping(UPDATE_USER_V1)
-    public ResponseEntity<Object> updateUser(@ModelAttribute UserDto user) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> updateUser(@ModelAttribute UserDto user) throws BusinessException, IOException {
         return userManagementService.updateUser(user);
     }
 
     @PutMapping(CHANGE_USER_STATUS_V1)
-    public ResponseEntity<Object> changeUserStatus(@RequestParam Integer userId, @RequestParam Character status) throws BMSCheckedException {
+    public ResponseEntity<Object> changeUserStatus(@RequestParam Integer userId, @RequestParam Character status) throws BusinessException {
         return userManagementService.changeUserStatus(userId, status);
     }
 
@@ -58,12 +57,12 @@ public class UserManagementController {
     }
 
     @PutMapping(UPDATE_USER_ADDRESS_V1)
-    public ResponseEntity<Object> updateUserAddress(@RequestBody AddressDto address) throws BMSCheckedException {
+    public ResponseEntity<Object> updateUserAddress(@RequestBody AddressDto address) throws BusinessException {
         return userManagementService.updateUserAddress(address);
     }
 
     @PostMapping(RESET_PASSWORD_V1)
-    public ResponseEntity<Object> resetPassword(@RequestBody Map<String, Object> requestBody) throws BMSCheckedException {
+    public ResponseEntity<Object> resetPassword(@RequestBody Map<String, Object> requestBody) throws BusinessException {
         return userManagementService.resetPassword(requestBody);
     }
 

@@ -1,12 +1,14 @@
 package com.bms.config;
 
 import com.bms.entity.UserMst;
+import com.bms.exception.BusinessException;
 import com.bms.repository.UserMstRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,7 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.bms.util.CommonConstants.*;
@@ -43,8 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = null;
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"status\":401,\"message\":\"Authorization header missing or invalid\"}");
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Authorization header missing or invalid");
             return;
         }
 
@@ -58,19 +58,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (username != null && jwtUtil.validateToken(jwt, username)) {
-
-            Optional<UserMst> userOpt = userMstRepository.findByUsername(username);
-
-            if (userOpt.isEmpty()) {
-                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "User not found");
-                return;
-            }
-
-            UserMst user = userOpt.get();
+            UserMst user = userMstRepository.findByUsername(username)
+                    .orElseThrow(() -> new BusinessException("User not found", HttpStatus.UNAUTHORIZED));
 
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
                     null, grantAuthorityCodes(new HashSet<>(), user.getRoleId())));
-
         } else {
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
             return;
@@ -79,10 +71,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             chain.doFilter(request, response);
         } catch (Exception e) {
-            if (response.getStatus() == HttpServletResponse.SC_OK) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if (e instanceof BusinessException) {
+                BusinessException be = (BusinessException) e;
+                sendErrorResponse(response, be.getStatus().value(), be.getMessage());
+            } else {
+                sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
             }
-            sendErrorResponse(response, response.getStatus(), e.getCause().getMessage());
         }
     }
 

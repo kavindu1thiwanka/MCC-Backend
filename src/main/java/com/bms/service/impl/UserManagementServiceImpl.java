@@ -7,13 +7,13 @@ import com.bms.entity.AddressMst;
 import com.bms.entity.CommonEmailMst;
 import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
+import com.bms.exception.BusinessException;
 import com.bms.repository.AddressMstRepository;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.repository.CommonEmailTemplateRepository;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.FileStorageService;
 import com.bms.service.UserManagementService;
-import com.bms.util.BMSCheckedException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -62,7 +62,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException {
+    public ResponseEntity<Object> registerUser(UserDto user) throws BusinessException {
 
         validateUserCreate(user);
 
@@ -82,7 +82,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> createUser(UserDto user) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> createUser(UserDto user) throws BusinessException, IOException {
 
         validateUserCreate(user);
         UserMst userMst = new UserMst(user);
@@ -100,12 +100,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      *
      * @param userMst user details
      */
-    private void sendConfirmationEmail(UserMst userMst) throws BMSCheckedException {
+    private void sendConfirmationEmail(UserMst userMst) throws BusinessException {
 
         Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_CONFIGURE_USER);
 
         if (templateOpt.isEmpty()) {
-            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+            throw new BusinessException(EMAIL_TEMPLATE_NOT_FOUND);
         }
 
         CommonEmailTemplate emailTemplate = templateOpt.get();
@@ -130,10 +130,10 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BusinessException, IOException {
 
         if (userDetails.getId() == null) {
-            throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_ID_CANNOT_BE_EMPTY);
         }
 
         UserMst existingUser = getExistingUser(userDetails.getId());
@@ -163,13 +163,13 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BMSCheckedException {
+    public ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BusinessException {
         if (userId == null) {
-            throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_ID_CANNOT_BE_EMPTY);
         }
 
         if (status == null) {
-            throw new BMSCheckedException(USER_STATUS_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_STATUS_CANNOT_BE_EMPTY);
         }
 
         UserMst existingUser = getExistingUser(userId);
@@ -177,7 +177,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (user.getUsername().equals(existingUser.getUsername())) {
-            throw new BMSCheckedException(USER_STATUS_CHANGE_NOT_ALLOWED);
+            throw new BusinessException(USER_STATUS_CHANGE_NOT_ALLOWED);
         }
 
         existingUser.setStatus(status);
@@ -206,12 +206,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException {
+    public ResponseEntity<Object> confirmUserEmail(String uuid) throws BusinessException {
 
         Optional<UserMst> userOpt = userMstRepository.findUserByUuid(uuid);
 
         if (userOpt.isEmpty()) {
-            throw new BMSCheckedException(USER_NOT_FOUND);
+            throw new BusinessException(USER_NOT_FOUND);
         }
 
         UserMst user = userOpt.get();
@@ -231,11 +231,11 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     /**
      * This method is used to send registration success email
      */
-    private void sendRegistrationSuccessEmail(UserMst user) throws BMSCheckedException {
+    private void sendRegistrationSuccessEmail(UserMst user) throws BusinessException {
         Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_REGISTRATION_SUCCESS);
 
         if (templateOpt.isEmpty()) {
-            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+            throw new BusinessException(EMAIL_TEMPLATE_NOT_FOUND);
         }
 
         CommonEmailTemplate emailTemplate = templateOpt.get();
@@ -303,7 +303,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BMSCheckedException {
+    public ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BusinessException {
         String extractedUsername = jwtUtil.extractUsername((String) requestBody.get("token"));
 
         if (extractedUsername == null) {
@@ -313,7 +313,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         Optional<UserMst> userOpt = userMstRepository.findByUsername(extractedUsername);
 
         if (userOpt.isEmpty() || !userOpt.get().getStatus().equals(STATUS_ACTIVE)) {
-            throw new BMSCheckedException(USER_NOT_FOUND);
+            throw new BusinessException(USER_NOT_FOUND);
         }
 
         UserMst user = userOpt.get();
@@ -321,11 +321,11 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         String newPassword = (String) requestBody.get("newPassword");
 
         if (newPassword == null || newPassword.isEmpty()) {
-            throw new BMSCheckedException(NEW_PASSWORD_CANNOT_BE_EMPTY);
+            throw new BusinessException(NEW_PASSWORD_CANNOT_BE_EMPTY);
         }
 
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new BMSCheckedException(NEW_PASSWORD_SAME_AS_OLD_PASSWORD);
+            throw new BusinessException(NEW_PASSWORD_SAME_AS_OLD_PASSWORD);
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -405,12 +405,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      *
      * @param user user details
      */
-    private void validateUserCreate(UserDto user) throws BMSCheckedException {
+    private void validateUserCreate(UserDto user) throws BusinessException {
 
         if (user.getIdentifier() == null) {
-            throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
+            throw new BusinessException(IDENTIFIER_NOT_FOUND);
         } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER, IDENTIFIER_ROLE_ADMIN).contains(user.getIdentifier())) {
-            throw new BMSCheckedException(INVALID_IDENTIFIER);
+            throw new BusinessException(INVALID_IDENTIFIER);
         }
 
         switch (user.getIdentifier()) {
@@ -426,7 +426,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         }
 
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new BMSCheckedException(USER_EMAIL_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_EMAIL_CANNOT_BE_EMPTY);
         } else {
             userMstRepository.findByEmailAndRoleIdAndStatusNot(user.getEmail(), user.getRoleId(), STATUS_DELETE).ifPresent(userMst -> {
                 throw new RuntimeException(USER_ALREADY_EXISTS);
@@ -434,19 +434,19 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         }
 
         if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-            throw new BMSCheckedException(FIRST_NAME_CANNOT_BE_EMPTY);
+            throw new BusinessException(FIRST_NAME_CANNOT_BE_EMPTY);
         }
 
         if (user.getLastName() == null || user.getLastName().isEmpty()) {
-            throw new BMSCheckedException(LAST_NAME_CANNOT_BE_EMPTY);
+            throw new BusinessException(LAST_NAME_CANNOT_BE_EMPTY);
         }
 
         if (user.getContactNumber() == null || user.getContactNumber().isEmpty()) {
-            throw new BMSCheckedException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
         }
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            throw new BMSCheckedException(USER_PASSWORD_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_PASSWORD_CANNOT_BE_EMPTY);
         }
     }
 

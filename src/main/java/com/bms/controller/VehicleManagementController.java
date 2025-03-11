@@ -3,8 +3,8 @@ package com.bms.controller;
 import com.bms.dto.CommonFilterDto;
 import com.bms.dto.ReservationDto;
 import com.bms.dto.VehicleMstDto;
+import com.bms.exception.BusinessException;
 import com.bms.service.VehicleManagementService;
-import com.bms.util.BMSCheckedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +31,14 @@ public class VehicleManagementController {
     }
 
     @PostMapping(GET_VEHICLE_TOTAL_COST)
-    public ResponseEntity<Object> getVehicleTotalCost(@RequestBody ReservationDto reservationDto) throws BMSCheckedException, StripeException {
+    public ResponseEntity<Object> getVehicleTotalCost(@RequestBody ReservationDto reservationDto) throws BusinessException, StripeException {
         return vehicleManagementService.getVehicleTotalCost(reservationDto);
     }
 
     @PostMapping(value = ADD_VEHICLE_V1, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Object> addVehicle(
             @RequestPart("vehicleMstDto") String vehicleMstDtoJson,
-            @RequestPart("vehicleImage") MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+            @RequestPart("vehicleImage") MultipartFile vehicleImage) throws BusinessException, IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         VehicleMstDto vehicleMstDto = objectMapper.readValue(vehicleMstDtoJson, VehicleMstDto.class);
@@ -48,12 +48,12 @@ public class VehicleManagementController {
 
 
     @PutMapping(UPDATE_VEHICLE_V1)
-    public ResponseEntity<Object> updateVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BMSCheckedException, IOException {
+    public ResponseEntity<Object> updateVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BusinessException, IOException {
         return vehicleManagementService.updateVehicle(vehicleMstDto, vehicleImage);
     }
 
     @PutMapping(UPDATE_VEHICLE_STATUS_V1)
-    public ResponseEntity<Object> updateVehicleStatus(@RequestParam String vehicleNumber, @RequestParam Character status) throws BMSCheckedException {
+    public ResponseEntity<Object> updateVehicleStatus(@RequestParam String vehicleNumber, @RequestParam Character status) throws BusinessException {
         return vehicleManagementService.updateVehicleStatus(vehicleNumber, status);
     }
 
@@ -63,7 +63,7 @@ public class VehicleManagementController {
     }
 
     @GetMapping(GET_VEHICLE_DETAILS_V1)
-    public ResponseEntity<Object> getVehicleDetails(@RequestParam String vehicleNumber) throws BMSCheckedException {
+    public ResponseEntity<Object> getVehicleDetails(@RequestParam String vehicleNumber) throws BusinessException {
         return vehicleManagementService.getVehicleDetails(vehicleNumber);
     }
 

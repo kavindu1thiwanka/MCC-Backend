@@ -3,9 +3,9 @@ package com.bms.service.impl;
 import com.bms.dto.ReportDto;
 import com.bms.dto.ReservationDto;
 import com.bms.entity.*;
+import com.bms.exception.BusinessException;
 import com.bms.repository.*;
 import com.bms.service.*;
-import com.bms.util.BMSCheckedException;
 import com.stripe.exception.StripeException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,7 +45,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Map<String, String>> createReservation(ReservationDto reservationDto) throws BMSCheckedException, StripeException {
+    public ResponseEntity<Map<String, String>> createReservation(ReservationDto reservationDto) throws BusinessException, StripeException {
 
         validateTransaction(reservationDto);
 
@@ -88,11 +88,11 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BMSCheckedException {
+    public ResponseEntity<Object> updateReservationDetails(Integer trxId, Character paymentStatus) throws BusinessException {
         Optional<TransactionMst> transactionOpt = transactionMstRepository.findById(trxId);
 
         if (transactionOpt.isEmpty()) {
-            throw new BMSCheckedException(TRANSACTION_NOT_FOUND);
+            throw new BusinessException(TRANSACTION_NOT_FOUND);
         }
 
         TransactionMst transactionMst = transactionOpt.get();
@@ -105,7 +105,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         Optional<ReservationMst> reservationOpt = reservationMstRepository.findById(transactionMst.getReservationId());
 
         if (reservationOpt.isEmpty()) {
-            throw new BMSCheckedException(RESERVATION_NOT_FOUND);
+            throw new BusinessException(RESERVATION_NOT_FOUND);
         }
 
         ReservationMst reservationMst = reservationOpt.get();
@@ -126,7 +126,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * This method is used to send reservation success email
      */
     @Async
-    public void sendReservationSuccessEmail(ReservationMst reservationMst, BigDecimal amount) throws BMSCheckedException {
+    public void sendReservationSuccessEmail(ReservationMst reservationMst, BigDecimal amount) throws BusinessException {
 
         ReservationDto reservationDto = new ReservationDto(reservationMst);
         reservationDto.setTotalCost(amount);
@@ -139,7 +139,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_RESERVATION_SUCCESSFUL);
 
         if (templateOpt.isEmpty()) {
-            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+            throw new BusinessException(EMAIL_TEMPLATE_NOT_FOUND);
         }
 
         CommonEmailTemplate emailTemplate = templateOpt.get();
@@ -196,11 +196,11 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * This method is used to update reservation status
      */
     @Override
-    public ResponseEntity<Object> updateReservationStatus(Integer reservationId, Character status) throws BMSCheckedException {
+    public ResponseEntity<Object> updateReservationStatus(Integer reservationId, Character status) throws BusinessException {
         Optional<ReservationMst> reservationMstOpt = reservationMstRepository.findById(reservationId);
 
         if (reservationMstOpt.isEmpty()) {
-            throw new BMSCheckedException(RESERVATION_NOT_FOUND);
+            throw new BusinessException(RESERVATION_NOT_FOUND);
         }
 
         ReservationMst reservationMst = reservationMstOpt.get();
@@ -220,7 +220,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * This method is used to get active reservation details
      */
     @Override
-    public ResponseEntity<Object> getActiveReservationDetails() throws BMSCheckedException {
+    public ResponseEntity<Object> getActiveReservationDetails() throws BusinessException {
         return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByStatus(Arrays.asList(STATUS_ACTIVE)), HttpStatus.OK);
     }
 
@@ -228,7 +228,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * This method is used to get reservation history details
      */
     @Override
-    public ResponseEntity<Object> getReservationHistoryDetails() throws BMSCheckedException {
+    public ResponseEntity<Object> getReservationHistoryDetails() throws BusinessException {
         return new ResponseEntity<>(reservationMstRepository.getReservationDetailsByStatus(Arrays.asList(STATUS_COMPLETE, STATUS_RESERVATION_CANCELLED)), HttpStatus.OK);
     }
 
@@ -262,12 +262,12 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      * This method is used to update onTrip status
      */
     @Override
-    public ResponseEntity<Object> changeOnTripStatus(Integer reservationId) throws BMSCheckedException {
+    public ResponseEntity<Object> changeOnTripStatus(Integer reservationId) throws BusinessException {
 
         Optional<ReservationMst> reservationMstOpt = reservationMstRepository.findById(reservationId);
 
         if (reservationMstOpt.isEmpty()) {
-            throw new BMSCheckedException(RESERVATION_NOT_FOUND);
+            throw new BusinessException(RESERVATION_NOT_FOUND);
         }
 
         ReservationMst reservationMst = reservationMstOpt.get();
@@ -303,7 +303,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     /**
      * This method is used to set driver id
      */
-    private void setDriverId(ReservationMst reservationMst) throws BMSCheckedException {
+    private void setDriverId(ReservationMst reservationMst) throws BusinessException {
         List<UserMst> allDrivers = userMstRepository.getAllAvailableDrivers();
 
         if (!allDrivers.isEmpty()) {
@@ -316,7 +316,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
                 .getFirst();
 
         if (driverId == null) {
-            throw new BMSCheckedException(DRIVERS_NOT_AVAILABLE);
+            throw new BusinessException(DRIVERS_NOT_AVAILABLE);
         }
 
         reservationMst.setDriverId(driverId);
@@ -327,21 +327,21 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
      *
      * @param reservationDto reservation details
      */
-    private void validateTransaction(ReservationDto reservationDto) throws BMSCheckedException {
+    private void validateTransaction(ReservationDto reservationDto) throws BusinessException {
         if (reservationDto.getVehicleNo() == null || reservationDto.getVehicleNo().isEmpty()) {
-            throw new BMSCheckedException(VEHICLE_NO_CANNOT_BE_EMPTY);
+            throw new BusinessException(VEHICLE_NO_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getPickUpDate() == null) {
-            throw new BMSCheckedException(PICK_UP_DATE_CANNOT_BE_EMPTY);
+            throw new BusinessException(PICK_UP_DATE_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getReturnDate() == null) {
-            throw new BMSCheckedException(RETURN_DATE_CANNOT_BE_EMPTY);
+            throw new BusinessException(RETURN_DATE_CANNOT_BE_EMPTY);
         }
 
         if (reservationDto.getPickUpLocation() == null || reservationDto.getPickUpLocation().isEmpty()) {
-            throw new BMSCheckedException(PICK_UP_LOCATION_CANNOT_BE_EMPTY);
+            throw new BusinessException(PICK_UP_LOCATION_CANNOT_BE_EMPTY);
         }
     }
 

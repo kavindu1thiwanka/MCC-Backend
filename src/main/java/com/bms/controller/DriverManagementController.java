@@ -1,7 +1,7 @@
 package com.bms.controller;
 
+import com.bms.exception.BusinessException;
 import com.bms.service.DriverManagementService;
-import com.bms.util.BMSCheckedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,17 +17,17 @@ public class DriverManagementController {
     private DriverManagementService driverManagementService;
 
     @PutMapping(UPDATE_ONLINE_STATUS_V1)
-    public ResponseEntity<Object> updateOnlineStatus(@RequestBody Boolean isOnline) throws BMSCheckedException {
+    public ResponseEntity<Object> updateOnlineStatus(@RequestBody Boolean isOnline) throws BusinessException {
         return driverManagementService.updateOnlineStatus(isOnline);
     }
 
     @GetMapping(GET_ONLINE_STATUS_V1)
-    public ResponseEntity<Object> getDriverDashboardDetails() throws BMSCheckedException {
+    public ResponseEntity<Object> getDriverDashboardDetails() throws BusinessException {
         return driverManagementService.getDriverDashboardDetails();
     }
 
     @GetMapping(GET_RIDES_HISTORY_V1)
-    public ResponseEntity<Object> getDriverRideHistory() throws BMSCheckedException {
+    public ResponseEntity<Object> getDriverRideHistory() throws BusinessException {
         return driverManagementService.getDriverRideHistory();
     }
 
