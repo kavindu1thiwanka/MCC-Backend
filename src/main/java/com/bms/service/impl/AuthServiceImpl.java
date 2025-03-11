@@ -7,7 +7,6 @@ import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.repository.CommonEmailTemplateRepository;
-import com.bms.repository.PrivilegeMstRepository;
 import com.bms.repository.UserMstRepository;
 import com.bms.service.AuthService;
 import com.bms.util.BMSCheckedException;
@@ -43,7 +42,6 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
     private JwtUtil jwtUtil;
     private UserMstRepository userMstRepository;
-    private PrivilegeMstRepository privilegeMstRepository;
     private CommonEmailTemplateRepository commonEmailTemplateRepository;
     private CommonEmailMstRepository commonEmailMstRepository;
 
@@ -68,11 +66,9 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
 
-            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
-
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(
-                            user, null, grantAuthorityCodes(authCodes)));
+                            user, null, grantAuthorityCodes(new HashSet<>())));
 
             AuthRequestDto response = new AuthRequestDto(
                     jwtUtil.generateAccessToken(authentication.getName()),
@@ -168,11 +164,6 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Autowired
-    public void setPrivilegeMstRepository(PrivilegeMstRepository privilegeMstRepository) {
-        this.privilegeMstRepository = privilegeMstRepository;
     }
 
     @Autowired

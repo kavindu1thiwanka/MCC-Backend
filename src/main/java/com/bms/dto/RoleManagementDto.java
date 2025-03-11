@@ -1,6 +1,5 @@
 package com.bms.dto;
 
-import com.bms.entity.RoleMst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

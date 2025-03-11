@@ -1,7 +1,6 @@
 package com.bms.config;
 
 import com.bms.entity.UserMst;
-import com.bms.repository.PrivilegeMstRepository;
 import com.bms.repository.UserMstRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtUtil jwtUtil;
     private UserMstRepository userMstRepository;
-    private PrivilegeMstRepository privilegeMstRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -70,10 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UserMst user = userOpt.get();
 
-            Set<String> authCodes = privilegeMstRepository.findPrivilegeIdByRoleId(user.getRoleId());
-
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user,
-                    null, grantAuthorityCodes(authCodes, user.getRoleId())));
+                    null, grantAuthorityCodes(new HashSet<>(), user.getRoleId())));
 
         } else {
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
@@ -133,10 +129,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void setUserMstRepository(UserMstRepository userMstRepository) {
         this.userMstRepository = userMstRepository;
     }
-
-    @Autowired
-    public void setPrivilegeMstRepository(PrivilegeMstRepository privilegeMstRepository) {
-        this.privilegeMstRepository = privilegeMstRepository;
-    }
-
 }
