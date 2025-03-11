@@ -5,8 +5,9 @@ import com.bms.dto.ReservationDto;
 import com.bms.dto.TransactionDto;
 import com.bms.entity.TransactionMst;
 import com.bms.entity.UserMst;
+import com.bms.repository.ReservationMstRepository;
+import com.bms.repository.TransactionMstRepository;
 import com.bms.service.ReportService;
-import com.bms.service.ReservationManagementService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -41,7 +42,8 @@ import static com.bms.util.CommonConstants.STATUS_COMPLETE;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    private ReservationManagementService reservationManagementService;
+    private ReservationMstRepository reservationMstRepository;
+    private TransactionMstRepository transactionMstRepository;
 
     /**
      * This method is used to generate report
@@ -65,7 +67,14 @@ public class ReportServiceImpl implements ReportService {
 
     private ResponseEntity<Object> generateReservationReport(ReportDto reportData) {
 
-        List<ReservationDto> reservationDetailsList = reservationManagementService.getReservationDetailsList(reportData);
+        List<ReservationDto> reservationDetailsList = new ArrayList<>();
+
+        if (reportData.getStartDate() == null || reportData.getEndDate() == null) {
+            reservationDetailsList = reservationMstRepository.getReservationDetails();
+        } else {
+            reservationDetailsList =  reservationMstRepository.getReservationDetailsByDate(reportData.getStartDate(), reportData.getEndDate());
+        }
+
 
         if (reservationDetailsList.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.OK);
@@ -191,7 +200,13 @@ public class ReportServiceImpl implements ReportService {
 
     private ResponseEntity<Object> generateRevenueReport(ReportDto reportData) {
 
-        List<TransactionMst> trxDetailsList = reservationManagementService.getTransactionDetailsList(reportData);
+        List<TransactionMst> trxDetailsList = new ArrayList<>();
+
+        if (reportData.getStartDate() == null || reportData.getEndDate() == null) {
+            trxDetailsList = transactionMstRepository.getTransactionDetails();
+        } else {
+            trxDetailsList = transactionMstRepository.getTransactionDetailsByDate(reportData.getStartDate(), reportData.getEndDate());
+        }
 
         List<TransactionDto> transactionList = new ArrayList<>();
         String currentDate = null;
@@ -464,7 +479,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Autowired
-    public void setReservationManagementService(ReservationManagementService reservationManagementService) {
-        this.reservationManagementService = reservationManagementService;
+    public void setReservationMstRepository(ReservationMstRepository reservationMstRepository) {
+        this.reservationMstRepository = reservationMstRepository;
+    }
+
+    @Autowired
+    public void setTransactionMstRepository(TransactionMstRepository transactionMstRepository) {
+        this.transactionMstRepository = transactionMstRepository;
     }
 }
