@@ -4,10 +4,7 @@ import com.bms.dto.ReportDto;
 import com.bms.dto.ReservationDto;
 import com.bms.entity.*;
 import com.bms.repository.*;
-import com.bms.service.EmailService;
-import com.bms.service.InvoiceService;
-import com.bms.service.ReservationManagementService;
-import com.bms.service.StripeService;
+import com.bms.service.*;
 import com.bms.util.BMSCheckedException;
 import com.stripe.exception.StripeException;
 import org.jsoup.Jsoup;
@@ -38,7 +35,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     private CommonEmailTemplateRepository commonEmailTemplateRepository;
     private VehicleMstRepository vehicleMstRepository;
     private CommonEmailMstRepository commonEmailMstRepository;
-    private InvoiceService invoiceService;
+    private ReportService reportService;
 
     /**
      * This method is used to create new reservation
@@ -180,7 +177,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         email.setStatus(STATUS_INACTIVE);
         commonEmailMstRepository.save(email);
 
-        byte[] invoiceBytes = invoiceService.generateInvoice(reservationDto);
+        byte[] invoiceBytes = reportService.generateInvoice(reservationDto);
 
         emailService.sendEmailWithAttachment(email.getId(), invoiceBytes);
 
@@ -389,7 +386,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
     }
 
     @Autowired
-    public void setInvoiceService(InvoiceService invoiceService) {
-        this.invoiceService = invoiceService;
+    public void setReportService(ReportService reportService) {
+        this.reportService = reportService;
     }
 }
