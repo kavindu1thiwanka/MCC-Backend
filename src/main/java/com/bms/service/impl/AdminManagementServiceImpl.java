@@ -61,7 +61,7 @@ public class AdminManagementServiceImpl implements AdminManagementService {
 
         for (ReservationMst reservation : reservationList) {
 
-            if (!lineChartLabels.contains(reservation.getPickUpDate().toString())
+            if (!lineChartLabels.contains(reservation.getPickUpDate().toString().split(" ")[0])
                     && (reservation.getStatus().equals(STATUS_COMPLETE) || reservation.getStatus().equals(STATUS_RESERVATION_CANCELLED))) {
                lineChartLabels.add(reservation.getPickUpDate().toString().split(" ")[0]);
             }
