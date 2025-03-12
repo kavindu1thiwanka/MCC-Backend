@@ -385,7 +385,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         Optional<UserMst> existingUserOpt = userMstRepository.findById(userId);
 
         if (existingUserOpt.isEmpty()) {
-            throw new RuntimeException(USER_NOT_FOUND);
+            throw new BusinessException(USER_NOT_FOUND);
         }
 
         return existingUserOpt.get();
