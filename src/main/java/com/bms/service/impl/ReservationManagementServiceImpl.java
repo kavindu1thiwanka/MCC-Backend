@@ -131,7 +131,7 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         ReservationDto reservationDto = new ReservationDto(reservationMst);
         reservationDto.setTotalCost(amount);
         reservationDto.setCustomerDetails(userMstRepository.findById(reservationMst.getUserId()).get());
-        if (reservationMst.getDriverId() != null) {
+        if (reservationMst.getDriverId() != null && reservationMst.getDriverId() != 0) {
             reservationDto.setDriverDetails(userMstRepository.findById(reservationMst.getDriverId()).get());
         }
         reservationDto.setVehicleModel(vehicleMstRepository.getVehicleModelByVehicleNumber(reservationMst.getVehicleNo()));
@@ -271,6 +271,11 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
         }
 
         ReservationMst reservationMst = reservationMstOpt.get();
+
+        if (reservationMst.getStatus().equals(STATUS_COMPLETE) || reservationMst.getStatus().equals(STATUS_RESERVATION_CANCELLED)) {
+            throw new BusinessException(COMPLETED_OR_CANCELLED_RESERVATIONS_STATUS_CANNOT_BE_UPDATED);
+        }
+
         reservationMst.setOnTrip(Boolean.TRUE);
         reservationMst.setUpdateOn(new Date());
         UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -311,9 +316,14 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
             return;
         }
 
-        Integer driverId = reservationMstRepository
-                .getReservationUnavailableDrivers(reservationMst.getPickUpDate(), reservationMst.getReturnDate())
-                .getFirst();
+        List<Integer> reservationUnavailableDriverIdList = reservationMstRepository
+                .getReservationUnavailableDrivers(reservationMst.getPickUpDate(), reservationMst.getReturnDate());
+
+        if (reservationUnavailableDriverIdList == null || reservationUnavailableDriverIdList.isEmpty()) {
+            throw new BusinessException(DRIVERS_NOT_AVAILABLE);
+        }
+
+        Integer driverId = reservationUnavailableDriverIdList.getFirst();
 
         if (driverId == null) {
             throw new BusinessException(DRIVERS_NOT_AVAILABLE);
@@ -338,6 +348,10 @@ public class ReservationManagementServiceImpl implements ReservationManagementSe
 
         if (reservationDto.getReturnDate() == null) {
             throw new BusinessException(RETURN_DATE_CANNOT_BE_EMPTY);
+        }
+
+        if (reservationDto.getReturnDate().before(reservationDto.getPickUpDate())) {
+            throw new BusinessException(INVALID_DATE);
         }
 
         if (reservationDto.getPickUpLocation() == null || reservationDto.getPickUpLocation().isEmpty()) {

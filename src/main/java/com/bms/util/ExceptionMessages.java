@@ -32,6 +32,7 @@ public abstract class ExceptionMessages {
     public static final String DRIVER_ID_CANNOT_BE_EMPTY = "Driver id cannot be empty";
     public static final String PICK_UP_DATE_CANNOT_BE_EMPTY = "Pick up date cannot be empty";
     public static final String RETURN_DATE_CANNOT_BE_EMPTY = "Return date cannot be empty";
+    public static final String INVALID_DATE = "User input date not valid";
     public static final String PICK_UP_LOCATION_CANNOT_BE_EMPTY = "Pick up location cannot be empty";
     public static final String DRIVERS_NOT_AVAILABLE = "No drivers available at the moment";
 
@@ -40,6 +41,7 @@ public abstract class ExceptionMessages {
 
     // Reservation & Payment Related Exceptions
     public static final String RESERVATION_NOT_FOUND = "Reservation not found";
+    public static final String COMPLETED_OR_CANCELLED_RESERVATIONS_STATUS_CANNOT_BE_UPDATED = "Completed or cancelled reservation's status cannot be updated";
     public static final String TRANSACTION_NOT_FOUND = "Transaction not found";
 
     // Vehicle Related Exceptions
