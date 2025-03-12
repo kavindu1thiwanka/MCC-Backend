@@ -100,9 +100,11 @@ public class AdminManagementServiceImpl implements AdminManagementService {
         for (UserMst driver : driverList) {
             if (driver.getIsOnline().equals(STATUS_YES)) {
                 onlineDriverCount = onlineDriverCount + 1;
-            } else if (driver.getIsOnline().equals(STATUS_NO)) {
+            } else {
                 offlineDriverCount = offlineDriverCount + 1;
-            } else if (Boolean.TRUE.equals(driver.getOnTrip())) {
+            }
+
+            if (Boolean.TRUE.equals(driver.getOnTrip())) {
                 onTripDriverCount = onTripDriverCount + 1;
             }
         }
