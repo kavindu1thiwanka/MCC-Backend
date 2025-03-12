@@ -88,16 +88,13 @@ class AdminManagementServiceImplTest {
 
     @Test
     void loadDashboardDetails_WithNoData_ShouldReturnEmptyStats() {
-        // Arrange
         when(userMstRepository.getAllActiveUsersCount()).thenReturn(0);
         when(userMstRepository.getAllActiveDrivers()).thenReturn(new ArrayList<>());
         when(reservationMstRepository.getReservationDetailsAfterDate(any(Date.class)))
                 .thenReturn(new ArrayList<>());
 
-        // Act
         ResponseEntity<Object> response = adminManagementService.loadDashboardDetails();
 
-        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
@@ -112,6 +109,96 @@ class AdminManagementServiceImplTest {
 
         Integer[] pieChartData = (Integer[]) responseBody.get("pieChartData");
         assertArrayEquals(new Integer[]{0, 0, 0}, pieChartData);
+
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> lineChartData = (HashMap<String, Object>) responseBody.get("lineChartData");
+        assertNotNull(lineChartData.get("labels"));
+        assertTrue(((List<?>) lineChartData.get("labels")).isEmpty());
+    }
+
+    @Test
+    void loadDashboardDetails_WithAllDriversOnline_ShouldShowCorrectStats() {
+        when(userMstRepository.getAllActiveUsersCount()).thenReturn(5);
+        
+        List<UserMst> allOnlineDrivers = createAllOnlineDrivers();
+        when(userMstRepository.getAllActiveDrivers()).thenReturn(allOnlineDrivers);
+        when(reservationMstRepository.getReservationDetailsAfterDate(any(Date.class)))
+                .thenReturn(new ArrayList<>());
+
+        ResponseEntity<Object> response = adminManagementService.loadDashboardDetails();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> responseBody = (HashMap<String, Object>) response.getBody();
+        
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> stats = (HashMap<String, Object>) responseBody.get("stats");
+        assertEquals(5, stats.get("totalUsers"));
+        assertEquals(3, stats.get("totalDrivers"));
+
+        Integer[] pieChartData = (Integer[]) responseBody.get("pieChartData");
+        assertArrayEquals(new Integer[]{3, 0, 0}, pieChartData);
+    }
+
+    @Test
+    void loadDashboardDetails_WithAllDriversOnTrip_ShouldShowCorrectStats() {
+        when(userMstRepository.getAllActiveUsersCount()).thenReturn(8);
+        
+        List<UserMst> allOnTripDrivers = createAllOnTripDrivers();
+        when(userMstRepository.getAllActiveDrivers()).thenReturn(allOnTripDrivers);
+        
+        List<ReservationMst> activeReservations = createActiveReservations();
+        when(reservationMstRepository.getReservationDetailsAfterDate(any(Date.class)))
+                .thenReturn(activeReservations);
+
+        ResponseEntity<Object> response = adminManagementService.loadDashboardDetails();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> responseBody = (HashMap<String, Object>) response.getBody();
+        
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> stats = (HashMap<String, Object>) responseBody.get("stats");
+        assertEquals(8, stats.get("totalUsers"));
+        assertEquals(3, stats.get("totalDrivers"));
+        assertEquals(3, stats.get("activeRides"));
+
+        Integer[] pieChartData = (Integer[]) responseBody.get("pieChartData");
+        assertArrayEquals(new Integer[]{0, 3, 3}, pieChartData);
+    }
+
+    @Test
+    void loadDashboardDetails_WithMultipleSameDayReservations_ShouldAggregateCorrectly() {
+        when(userMstRepository.getAllActiveUsersCount()).thenReturn(10);
+        when(userMstRepository.getAllActiveDrivers()).thenReturn(new ArrayList<>());
+        
+        List<ReservationMst> multipleReservations = createMultipleSameDayReservations();
+        when(reservationMstRepository.getReservationDetailsAfterDate(any(Date.class)))
+                .thenReturn(multipleReservations);
+
+        ResponseEntity<Object> response = adminManagementService.loadDashboardDetails();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> responseBody = (HashMap<String, Object>) response.getBody();
+        
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> lineChartData = (HashMap<String, Object>) responseBody.get("lineChartData");
+        
+        @SuppressWarnings("unchecked")
+        List<String> labels = (List<String>) lineChartData.get("labels");
+        assertEquals(1, labels.size(), "Should have only one date label for same-day reservations");
+        
+        @SuppressWarnings("unchecked")
+        List<Integer[]> datasets = (List<Integer[]>) lineChartData.get("datasets");
+        Integer[] completedData = datasets.get(0);
+        Integer[] cancelledData = datasets.get(1);
+        
+        assertEquals(2, completedData[0], "Should have 2 completed reservations");
+        assertEquals(3, cancelledData[0], "Should have 3 cancelled reservations");
     }
 
     private List<UserMst> createMockDrivers() {
@@ -134,6 +221,79 @@ class AdminManagementServiceImplTest {
         drivers.add(onTripDriver);
         
         return drivers;
+    }
+
+    private List<UserMst> createAllOnlineDrivers() {
+        List<UserMst> drivers = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            UserMst driver = new UserMst();
+            driver.setIsOnline('Y');
+            driver.setOnTrip(false);
+            drivers.add(driver);
+        }
+        return drivers;
+    }
+
+    private List<UserMst> createAllOnTripDrivers() {
+        List<UserMst> drivers = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            UserMst driver = new UserMst();
+            driver.setIsOnline('N');
+            driver.setOnTrip(true);
+            drivers.add(driver);
+        }
+        return drivers;
+    }
+
+    private List<ReservationMst> createActiveReservations() {
+        List<ReservationMst> reservations = new ArrayList<>();
+        
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date lastMonth = cal.getTime();
+        
+        for (int i = 0; i < 3; i++) {
+            ReservationMst reservation = new ReservationMst();
+            reservation.setStatus(STATUS_ACTIVE);
+            reservation.setPickUpDate(lastMonth);
+            reservations.add(reservation);
+        }
+        
+        return reservations;
+    }
+
+    private List<ReservationMst> createMultipleSameDayReservations() {
+        List<ReservationMst> reservations = new ArrayList<>();
+        
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date lastMonth = cal.getTime();
+        
+        // Add 2 completed reservations
+        for (int i = 0; i < 2; i++) {
+            ReservationMst reservation = new ReservationMst();
+            reservation.setStatus(STATUS_COMPLETE);
+            reservation.setPickUpDate(lastMonth);
+            reservations.add(reservation);
+        }
+        
+        // Add 3 cancelled reservations
+        for (int i = 0; i < 3; i++) {
+            ReservationMst reservation = new ReservationMst();
+            reservation.setStatus(STATUS_RESERVATION_CANCELLED);
+            reservation.setPickUpDate(lastMonth);
+            reservations.add(reservation);
+        }
+        
+        return reservations;
     }
 
     private List<ReservationMst> createMockReservations() {
