@@ -44,36 +44,34 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Override
     public ResponseEntity<Object> getVehicleList(CommonFilterDto commonFilterDto) {
 
-        throw new BusinessException("Exception Check");
+        List<VehicleMstDto> vehicleList = vehicleManagementCustomRepository.getVehicleList(commonFilterDto);
+        HashMap<String, List<ReservationMst>> reservationMap = getReservationMap(commonFilterDto.getCategory());
 
-//        List<VehicleMstDto> vehicleList = vehicleManagementCustomRepository.getVehicleList(commonFilterDto);
-//        HashMap<String, List<ReservationMst>> reservationMap = getReservationMap(commonFilterDto.getCategory());
-//
-//        List<VehicleMstDto> availableVehicleList = new ArrayList<>();
-//
-//        for (VehicleMstDto vehicle : vehicleList) {
-//            if (!reservationMap.containsKey(vehicle.getVehicleNo())) {
-//                availableVehicleList.add(vehicle);
-//                continue;
-//            }
-//
-//            boolean unavailable = false;
-//            for (ReservationMst reservation : reservationMap.get(vehicle.getVehicleNo())) {
-//
-//                unavailable = (commonFilterDto.getPickUpDate().after(reservation.getPickUpDate())
-//                        && commonFilterDto.getPickUpDate().before(reservation.getReturnDate()))
-//                        || (commonFilterDto.getReturnDate().after(reservation.getPickUpDate())
-//                        && commonFilterDto.getReturnDate().before(reservation.getReturnDate()));
-//
-//                if (unavailable) {
-//                    break;
-//                }
-//            }
-//            if (!unavailable) {
-//                availableVehicleList.add(vehicle);
-//            }
-//        }
-//        return new ResponseEntity<>(availableVehicleList, HttpStatus.OK);
+        List<VehicleMstDto> availableVehicleList = new ArrayList<>();
+
+        for (VehicleMstDto vehicle : vehicleList) {
+            if (!reservationMap.containsKey(vehicle.getVehicleNo())) {
+                availableVehicleList.add(vehicle);
+                continue;
+            }
+
+            boolean unavailable = false;
+            for (ReservationMst reservation : reservationMap.get(vehicle.getVehicleNo())) {
+
+                unavailable = (commonFilterDto.getPickUpDate().after(reservation.getPickUpDate())
+                        && commonFilterDto.getPickUpDate().before(reservation.getReturnDate()))
+                        || (commonFilterDto.getReturnDate().after(reservation.getPickUpDate())
+                        && commonFilterDto.getReturnDate().before(reservation.getReturnDate()));
+
+                if (unavailable) {
+                    break;
+                }
+            }
+            if (!unavailable) {
+                availableVehicleList.add(vehicle);
+            }
+        }
+        return new ResponseEntity<>(availableVehicleList, HttpStatus.OK);
     }
 
     private HashMap<String, List<ReservationMst>> getReservationMap(String category) {
