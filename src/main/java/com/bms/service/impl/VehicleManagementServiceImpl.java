@@ -207,6 +207,11 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
                     existingVehicle.getVehicleImage()));
         }
 
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        existingVehicle.setUpdateBy(user.getUsername());
+        existingVehicle.setUpdateOn(new Date());
+
+        vehicleMstRepository.save(existingVehicle);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
