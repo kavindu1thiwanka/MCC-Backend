@@ -149,7 +149,9 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
         userMstRepository.save(existingUser);
 
-        existingUser.setLoggedInProfileUpdated(SecurityContextHolder.getContext().getAuthentication().getName().equals(existingUser.getUsername()));
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        existingUser.setLoggedInProfileUpdated(user.getUsername().equals(existingUser.getUsername()));
 
         return new ResponseEntity<>(existingUser, HttpStatus.OK);
 

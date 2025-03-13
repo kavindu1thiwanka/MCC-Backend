@@ -105,7 +105,7 @@ public class ReportServiceImpl implements ReportService {
             contentStream.showText("Reservations Report");
             contentStream.endText();
 
-            addMetadata(contentStream, reportData.getStartDate(), reportData.getEndDate(), 750, 900);
+            addMetadata(contentStream, reportData.getStartDate(), reportData.getEndDate(), 750, 750);
 
             float margin = 50;
             float yStart = 700 - margin;

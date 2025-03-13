@@ -42,6 +42,7 @@ public class CommonEmailMst extends CommonBaseEntity implements Serializable {
         this.content = content;
         this.status = STATUS_UNSENT;
         this.createdOn = new Date();
-        this.createdBy = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        this.createdBy = user.getUsername();
     }
 }
