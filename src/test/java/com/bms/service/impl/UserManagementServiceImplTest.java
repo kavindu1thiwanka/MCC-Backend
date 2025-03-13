@@ -440,8 +440,4 @@ class UserManagementServiceImplTest {
         assertEquals(HttpStatus.EXPECTATION_FAILED, exception.getStatus());
         verify(userMstRepository, never()).save(any());
     }
-
-    // File validation error messages
-    private static final String INVALID_FILE_TYPE = "Invalid file type. Only image files are allowed.";
-    private static final String FILE_SIZE_EXCEEDED = "File size exceeds the maximum limit of 5MB.";
 }

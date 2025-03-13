@@ -6,9 +6,11 @@ import com.bms.repository.ReservationMstRepository;
 import com.bms.repository.UserMstRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Profile("test")
+@ExtendWith(MockitoExtension.class)
 class AdminManagementServiceImplTest {
 
     @Mock
