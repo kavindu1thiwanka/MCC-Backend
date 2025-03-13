@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+gcs-key.json
+
+# Ignore files ending with ~
+*~
+

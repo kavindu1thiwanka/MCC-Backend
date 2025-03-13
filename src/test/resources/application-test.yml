@@ -1,0 +1,62 @@
+#######################################################################################################################
+# ---------------------------------------------------- test PROFILE ----------------------------------------------------
+#######################################################################################################################
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kavidu12thiwanka@gmail.com
+    password: nifb rxor erve hoxw
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+    from: bms@info.com
+    retry-count: 3
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+application:
+  url:
+    confirm-email: http://localhost:4201/#/confirm-email?uuid=UUID
+    login: http://localhost:4201/#/login
+    pwd-reset: http://localhost:4201/#/reset-password?tkn=PWD_RESET_TOKEN
+  cors-allow-origins: http://localhost:4201
+  stripe:
+    api:
+      key: sk_test_51Qt6lSBMe5OPqu5U0HwY1BTOnjRSwPwOXvV4ni8ICgQmWd29L4ntEvrc9NsfFwkVI2FFVPLE3zE5JWeqwSsbQdSS00iPgahlvk
+    url:
+      success: http://localhost:4201/#/payment-success?id=PARAM_ID
+      cancel: http://localhost:4201/#/payment-cancel?id=PARAM_ID
+
+jwt:
+  secret: n5Jw3/Z7DTz5e4fHn5rG6ftBLh5yYmbHZH8kpoIzjvE=
+
+gcp:
+  project-id: bmslocation-450907
+  credentials:
+    location: classpath:gcs-key.json
+  bucket-name: mcc_bucket_1
+
+---

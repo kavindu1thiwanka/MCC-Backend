@@ -1,43 +1,39 @@
 package com.bms.dto;
 
+import com.bms.entity.UserMst;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import static com.bms.util.CommonConstants.*;
+
+@Data
+@NoArgsConstructor
 public class AuthRequestDto {
     private String username;
     private String password;
-    private String token;
+    private String identifier;
+    private String firstName;
+    private String lastName;
+    private String accessToken;
+    private String refreshToken;
 
-    public AuthRequestDto() {
+    public AuthRequestDto(String accessToken, String refreshToken) {
+        this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
     }
 
-    public AuthRequestDto(String token) {
-        this.token = token;
-    }
+    public AuthRequestDto(String accessToken, String refreshToken, UserMst user) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
 
-    public AuthRequestDto(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
+        if (user.getRoleId().equals(ROLE_ID_ADMIN)) {
+            this.identifier = IDENTIFIER_ROLE_ADMIN;
+        } else if (user.getRoleId().equals(ROLE_ID_CUSTOMER)) {
+            this.identifier = IDENTIFIER_ROLE_CUSTOMER;
+        } else if (user.getRoleId().equals(ROLE_ID_DRIVER)) {
+            this.identifier = IDENTIFIER_ROLE_DRIVER;
+        }
     }
 }

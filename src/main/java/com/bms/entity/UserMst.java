@@ -1,60 +1,97 @@
 package com.bms.entity;
 
 import com.bms.dto.UserDto;
+import com.bms.entity.abst.CommonBaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.UUID;
 
-import static com.bms.util.CommonConstant.STATUS_ACTIVE;
+import static com.bms.util.CommonConstants.*;
 
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "user_mst")
-public class UserMst {
+@EqualsAndHashCode(callSuper = true)
+public class UserMst extends CommonBaseEntity implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "uuid", nullable = false)
+    private String uuid;
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
+
+    @Column(name = "role_id", nullable = false)
+    private Integer roleId;
 
     @Column(name = "contact_number")
     private String contactNumber;
 
-    @Column(name = "status")
+    @Column(name = "driver_license_no")
+    private String driverLicenseNo;
+
+    @Column(name = "driver_license_url")
+    private String driverLicenseUrl;
+
+    @Column(name = "is_online")
+    private Character isOnline;
+
+    @Column(name = "on_trip")
+    private Boolean onTrip;
+
+    @Column(name = "status", nullable = false)
     private Character status;
 
-    @Transient
-    private Set<String> roleList = new HashSet<>();
-    @Transient
-    private Set<Integer> roleIdList = new HashSet<>();
+    private transient boolean isLoggedInProfileUpdated;
 
     public UserMst(UserDto user) {
-        this.username = user.getUsername();
+        this.uuid = UUID.randomUUID().toString();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
+        this.username = this.email;
         this.contactNumber = user.getContactNumber();
-        this.status = STATUS_ACTIVE;
+        this.driverLicenseNo = user.getDriverLicenseNo();
+        this.status = STATUS_INACTIVE;
+
+        switch (user.getIdentifier()) {
+            case IDENTIFIER_ROLE_CUSTOMER:
+                this.roleId = ROLE_ID_CUSTOMER;
+                break;
+            case IDENTIFIER_ROLE_DRIVER:
+                this.roleId = ROLE_ID_DRIVER;
+                break;
+            case IDENTIFIER_ROLE_ADMIN:
+                this.roleId = ROLE_ID_ADMIN;
+                break;
+        }
+
+        if (this.roleId == ROLE_ID_DRIVER) {
+            this.isOnline = STATUS_NO;
+        }
+    }
+
+    public void updateUserDetails(UserDto userDetails) {
+        this.firstName = userDetails.getFirstName();
+        this.lastName = userDetails.getLastName();
+        this.email = userDetails.getEmail();
+        this.contactNumber = userDetails.getContactNumber();
+        this.driverLicenseNo = userDetails.getDriverLicenseNo();
     }
 }
