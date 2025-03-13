@@ -1,14 +1,19 @@
 package com.bms.service.impl;
 
+import com.bms.config.JwtUtil;
+import com.bms.dto.AddressDto;
 import com.bms.dto.UserDto;
+import com.bms.entity.AddressMst;
 import com.bms.entity.CommonEmailMst;
 import com.bms.entity.CommonEmailTemplate;
 import com.bms.entity.UserMst;
+import com.bms.exception.BusinessException;
+import com.bms.repository.AddressMstRepository;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.repository.CommonEmailTemplateRepository;
 import com.bms.repository.UserMstRepository;
+import com.bms.service.FileStorageService;
 import com.bms.service.UserManagementService;
-import com.bms.util.BMSCheckedException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,26 +30,29 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 
 import static com.bms.util.CommonConstants.*;
 import static com.bms.util.ExceptionMessages.*;
 
 @Service
-@Transactional
 public class UserManagementServiceImpl implements UserManagementService, UserDetailsService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private UserMstRepository userMstRepository;
     private CommonEmailMstRepository commonEmailMstRepository;
     private CommonEmailTemplateRepository commonEmailTemplateRepository;
+    private AddressMstRepository addressMstRepository;
+    private JwtUtil jwtUtil;
+    private FileStorageService fileStorageService;
 
     @Value(CONFIRM_USER_EMAIL_URL)
     private String confirmUserEmailUrl;
+    @Value(LOGIN_URL)
+    private String loginUrl;
 
     /**
      * This method is used to register users (Customers & Drivers)
@@ -52,15 +61,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return ResponseEntity
      */
     @Override
-    public ResponseEntity<Object> registerUser(UserDto user) throws BMSCheckedException {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> registerUser(UserDto user) throws BusinessException {
 
         validateUserCreate(user);
 
         UserMst userMst = new UserMst(user);
-
-        if (userMst.getRoleId().equals(ROLE_ID_DRIVER) && (userMst.getDriverLicenseNo() == null || userMst.getDriverLicenseNo().isEmpty())) {
-            throw new BMSCheckedException(DRIVER_LICENSE_NO_CANNOT_BE_EMPTY);
-        }
 
         userMst.setPassword(passwordEncoder.encode(user.getPassword()));
         userMstRepository.save(userMst);
@@ -71,16 +77,35 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     }
 
     /**
+     * This method is used to create users through admin dashboard
+     * the difference between this method and registerUser is that this method will not send confirmation email
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> createUser(UserDto user) throws BusinessException, IOException {
+
+        validateUserCreate(user);
+        UserMst userMst = new UserMst(user);
+        userMst.setStatus(STATUS_ACTIVE);
+        userMst.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getDrivingLicense() != null) {
+            userMst.setDriverLicenseUrl(fileStorageService.uploadDriverLicense(user.getDrivingLicense(), user.getDriverLicenseNo(), null));
+        }
+        userMstRepository.save(userMst);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    /**
      * This method is used to send confirmation email to user
      *
      * @param userMst user details
      */
-    private void sendConfirmationEmail(UserMst userMst) throws BMSCheckedException {
+    private void sendConfirmationEmail(UserMst userMst) throws BusinessException {
 
         Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_CONFIGURE_USER);
 
         if (templateOpt.isEmpty()) {
-            throw new BMSCheckedException(EMAIL_TEMPLATE_NOT_FOUND);
+            throw new BusinessException(EMAIL_TEMPLATE_NOT_FOUND);
         }
 
         CommonEmailTemplate emailTemplate = templateOpt.get();
@@ -93,15 +118,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         Element configurationUrlElement = html.body().getElementById(PARAM_CONFIGURATION_URL);
         configurationUrlElement.attr(HREF_ATTR, confirmUserEmailUrl.replace(PARAM_UUID, userMst.getUuid()));
 
-        CommonEmailMst commonEmailMst = new CommonEmailMst();
-        commonEmailMst.setSendTo(userMst.getEmail());
-        commonEmailMst.setSubject(emailTemplate.getSubject());
-        commonEmailMst.setContent(html.html());
-        commonEmailMst.setStatus(STATUS_UNSENT);
-
-        commonEmailMst.setCreatedOn(new Date());
-        commonEmailMst.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
-
+        CommonEmailMst commonEmailMst = new CommonEmailMst(userMst.getEmail(), emailTemplate.getSubject(), html.html());
         commonEmailMstRepository.save(commonEmailMst);
     }
 
@@ -112,82 +129,64 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus 200
      */
     @Override
-    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BMSCheckedException {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> updateUser(UserDto userDetails) throws BusinessException, IOException {
 
         if (userDetails.getId() == null) {
-            throw new BMSCheckedException(USER_ID_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_ID_CANNOT_BE_EMPTY);
         }
 
         UserMst existingUser = getExistingUser(userDetails.getId());
         existingUser.updateUserDetails(userDetails);
-        existingUser.setPassword(userDetails.getPassword() == null
+        existingUser.setPassword((userDetails.getPassword() == null || userDetails.getPassword().isEmpty())
                 ? existingUser.getPassword() : passwordEncoder.encode(userDetails.getPassword()));
         setUsersUpdatedMetaData(existingUser);
 
+        if (userDetails.getDrivingLicense() != null) {
+            existingUser.setDriverLicenseUrl(fileStorageService.uploadDriverLicense(userDetails.getDrivingLicense(), userDetails.getDriverLicenseNo(),
+                    existingUser.getDriverLicenseUrl()));
+        }
+
         userMstRepository.save(existingUser);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        existingUser.setLoggedInProfileUpdated(user.getUsername().equals(existingUser.getUsername()));
+
+        return new ResponseEntity<>(existingUser, HttpStatus.OK);
 
     }
 
     /**
-     * This method is used to activate user
+     * This method is used to change user status
      *
-     * @param userId user id
-     * @return HttpStatus 200
+     * @param userId userId that needs to be changed the status
+     * @param status Active, Inactive or Deleted
      */
     @Override
-    public ResponseEntity<Object> activateUser(Integer userId) throws BMSCheckedException {
-
-        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_ACTIVE);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * This method is used to inactivate user
-     *
-     * @param userId user id
-     * @return HttpStatus 200
-     */
-    @Override
-    public ResponseEntity<Object> inactivateUser(Integer userId) throws BMSCheckedException {
-
-        changeUserStatus(new ArrayList<>(userId), STATUS_INACTIVE);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * This method is used to delete user
-     *
-     * @param userId user id
-     * @return HttpStatus 200
-     */
-    @Override
-    public ResponseEntity<Object> deleteUser(Integer userId) throws BMSCheckedException {
-
-        changeUserStatus(new ArrayList<>(List.of(userId)), STATUS_DELETE);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /**
-     * This method is used to change user's status
-     */
-    private void changeUserStatus(List<Integer> userIdList, Character status) throws BMSCheckedException {
-
-        if (userIdList == null || userIdList.isEmpty()) {
-            throw new BMSCheckedException(USER_IDS_CANNOT_BE_EMPTY);
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> changeUserStatus(Integer userId, Character status) throws BusinessException {
+        if (userId == null) {
+            throw new BusinessException(USER_ID_CANNOT_BE_EMPTY);
         }
 
-        List<UserMst> updatedUserList = new ArrayList<>();
-
-        for (Integer userId : userIdList) {
-            UserMst existingUser = getExistingUser(userId);
-            existingUser.setStatus(status);
-            setUsersUpdatedMetaData(existingUser);
-            updatedUserList.add(existingUser);
+        if (status == null) {
+            throw new BusinessException(USER_STATUS_CANNOT_BE_EMPTY);
         }
 
-        userMstRepository.saveAll(updatedUserList);
+        UserMst existingUser = getExistingUser(userId);
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user.getUsername().equals(existingUser.getUsername())) {
+            throw new BusinessException(USER_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        existingUser.setStatus(status);
+        setUsersUpdatedMetaData(existingUser);
+
+        userMstRepository.save(existingUser);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
@@ -208,24 +207,176 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      * @return HttpStatus
      */
     @Override
-    public ResponseEntity<Object> confirmUserEmail(String uuid) throws BMSCheckedException {
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> confirmUserEmail(String uuid) throws BusinessException {
 
         Optional<UserMst> userOpt = userMstRepository.findUserByUuid(uuid);
 
         if (userOpt.isEmpty()) {
-            throw new BMSCheckedException(USER_NOT_FOUND);
+            throw new BusinessException(USER_NOT_FOUND);
         }
 
         UserMst user = userOpt.get();
 
         if (user.getStatus().equals(STATUS_ACTIVE)) {
-            throw new BMSCheckedException(USER_ALREADY_EXISTS);
+            return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
         }
 
         user.setStatus(STATUS_ACTIVE);
         userMstRepository.save(user);
 
+        sendRegistrationSuccessEmail(user);
+
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to send registration success email
+     */
+    private void sendRegistrationSuccessEmail(UserMst user) throws BusinessException {
+        Optional<CommonEmailTemplate> templateOpt = commonEmailTemplateRepository.findById(EMAIL_TEMPLATE_REGISTRATION_SUCCESS);
+
+        if (templateOpt.isEmpty()) {
+            throw new BusinessException(EMAIL_TEMPLATE_NOT_FOUND);
+        }
+
+        CommonEmailTemplate emailTemplate = templateOpt.get();
+
+        Document html = Jsoup.parse(emailTemplate.getTemplateData(), CHARACTER_TYPE);
+
+        Element emailSendToElement = html.body().getElementById(PARAM_EMAIL_SEND_TO);
+        emailSendToElement.html(user.getFirstName().concat(EMPTY_SPACE_STRING).concat(user.getLastName() == null ? EMPTY_STRING : user.getLastName()));
+
+        Element loginUrlElement = html.body().getElementById(PARAM_LOGIN_URL);
+        loginUrlElement.attr(HREF_ATTR, loginUrl);
+
+        Element usernameElement = html.body().getElementById(PARAM_USERNAME);
+        usernameElement.html(user.getUsername());
+
+        CommonEmailMst commonEmailMst = new CommonEmailMst(user.getEmail(), emailTemplate.getSubject(), html.html());
+        commonEmailMstRepository.save(commonEmailMst);
+    }
+
+    /**
+     * This method is used to get user address
+     */
+    @Override
+    public ResponseEntity<Object> getUserAddress() {
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return new ResponseEntity<>(addressMstRepository.getAddressMstByUserName(user.getUsername()), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to update current logged-in user's address
+     *
+     * @param address updated address details
+     * @return HttpStatus
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> updateUserAddress(AddressDto address) {
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        AddressMst existingAddress = addressMstRepository.getAddressMstByUserName(user.getUsername());
+
+        if (existingAddress == null) {
+            existingAddress = AddressMst.builder()
+                    .userId(user.getId())
+                    .addressLine1(address.getAddressLine1())
+                    .addressLine2(address.getAddressLine2())
+                    .city(address.getCity())
+                    .state(address.getState())
+                    .country(address.getCountry())
+                    .postalCode(address.getPostalCode())
+                    .build();
+        } else {
+            existingAddress.copyAddressDetails(address);
+        }
+        addressMstRepository.save(existingAddress);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to reset password
+     *
+     * @param requestBody token and new password
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseEntity<Object> resetPassword(Map<String, Object> requestBody) throws BusinessException {
+        String extractedUsername = jwtUtil.extractUsername((String) requestBody.get("token"));
+
+        if (extractedUsername == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Optional<UserMst> userOpt = userMstRepository.findByUsername(extractedUsername);
+
+        if (userOpt.isEmpty() || !userOpt.get().getStatus().equals(STATUS_ACTIVE)) {
+            throw new BusinessException(USER_NOT_FOUND);
+        }
+
+        UserMst user = userOpt.get();
+
+        String newPassword = (String) requestBody.get("newPassword");
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new BusinessException(NEW_PASSWORD_CANNOT_BE_EMPTY);
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new BusinessException(NEW_PASSWORD_SAME_AS_OLD_PASSWORD);
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userMstRepository.save(user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve logged-in user details
+     */
+    @Override
+    public ResponseEntity<Object> getLoggedInUserDetails() {
+
+        UserMst user = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<UserMst> userOpt = userMstRepository.findById(user.getId());
+
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException(USER_NOT_FOUND);
+        }
+
+        UserDto userDto = new UserDto(userOpt.get());
+
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve all users
+     */
+    @Override
+    public ResponseEntity<Object> getAllUsers() {
+        return new ResponseEntity<>(userMstRepository.getAllUsers(), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve all drivers
+     */
+    @Override
+    public ResponseEntity<Object> getAllDrivers() {
+        return new ResponseEntity<>(userMstRepository.getAllDrivers(), HttpStatus.OK);
+    }
+
+    /**
+     * This method is used to retrieve all admins
+     */
+    @Override
+    public ResponseEntity<Object> getAllAdmins() {
+        return new ResponseEntity<>(userMstRepository.getAllAdmins(), HttpStatus.OK);
     }
 
     /**
@@ -236,7 +387,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         Optional<UserMst> existingUserOpt = userMstRepository.findById(userId);
 
         if (existingUserOpt.isEmpty()) {
-            throw new RuntimeException(USER_NOT_FOUND);
+            throw new BusinessException(USER_NOT_FOUND);
         }
 
         return existingUserOpt.get();
@@ -256,36 +407,48 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
      *
      * @param user user details
      */
-    private void validateUserCreate(UserDto user) throws BMSCheckedException {
+    private void validateUserCreate(UserDto user) throws BusinessException {
+
+        if (user.getIdentifier() == null) {
+            throw new BusinessException(IDENTIFIER_NOT_FOUND);
+        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER, IDENTIFIER_ROLE_ADMIN).contains(user.getIdentifier())) {
+            throw new BusinessException(INVALID_IDENTIFIER);
+        }
+
+        switch (user.getIdentifier()) {
+            case IDENTIFIER_ROLE_CUSTOMER:
+                user.setId(ROLE_ID_CUSTOMER);
+                break;
+            case IDENTIFIER_ROLE_DRIVER:
+                user.setId(ROLE_ID_DRIVER);
+                break;
+            case IDENTIFIER_ROLE_ADMIN:
+                user.setId(ROLE_ID_ADMIN);
+                break;
+        }
 
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new BMSCheckedException(USER_EMAIL_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_EMAIL_CANNOT_BE_EMPTY);
         } else {
-            userMstRepository.findByEmailAndStatusNot(user.getEmail(), STATUS_DELETE).ifPresent(userMst -> {
+            userMstRepository.findByEmailAndRoleIdAndStatusNot(user.getEmail(), user.getRoleId(), STATUS_DELETE).ifPresent(userMst -> {
                 throw new RuntimeException(USER_ALREADY_EXISTS);
             });
         }
 
         if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-            throw new BMSCheckedException(FIRST_NAME_CANNOT_BE_EMPTY);
+            throw new BusinessException(FIRST_NAME_CANNOT_BE_EMPTY);
         }
 
         if (user.getLastName() == null || user.getLastName().isEmpty()) {
-            throw new BMSCheckedException(LAST_NAME_CANNOT_BE_EMPTY);
+            throw new BusinessException(LAST_NAME_CANNOT_BE_EMPTY);
         }
 
         if (user.getContactNumber() == null || user.getContactNumber().isEmpty()) {
-            throw new BMSCheckedException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
+            throw new BusinessException(USER_CONTACT_NUMBER_CANNOT_BE_EMPTY);
         }
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            throw new BMSCheckedException(USER_PASSWORD_CANNOT_BE_EMPTY);
-        }
-
-        if (user.getIdentifier() == null) {
-            throw new BMSCheckedException(IDENTIFIER_NOT_FOUND);
-        } else if (!List.of(IDENTIFIER_ROLE_CUSTOMER, IDENTIFIER_ROLE_DRIVER).contains(user.getIdentifier())) {
-            throw new BMSCheckedException(INVALID_IDENTIFIER);
+            throw new BusinessException(USER_PASSWORD_CANNOT_BE_EMPTY);
         }
     }
 
@@ -297,21 +460,21 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
         String role = "";
 
         if (user.getRoleId().equals(ROLE_ID_ADMIN)) {
-            role = ROLE_ADMIN;
+            role = ROLE_ADMIN_WITH_ROLE_PREFIX;
         }
 
         if (user.getRoleId().equals(ROLE_ID_CUSTOMER)) {
-            role = ROLE_CUSTOMER;
+            role = ROLE_CUSTOMER_WITH_ROLE_PREFIX;
         }
 
         if (user.getRoleId().equals(ROLE_ID_DRIVER)) {
-            role = ROLE_DRIVER;
+            role = ROLE_DRIVER_WITH_ROLE_PREFIX;
         }
 
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(role)
+                .authorities(role)
                 .build();
     }
 
@@ -328,5 +491,20 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
     @Autowired
     public void setCommonEmailTemplateRepository(CommonEmailTemplateRepository commonEmailTemplateRepository) {
         this.commonEmailTemplateRepository = commonEmailTemplateRepository;
+    }
+
+    @Autowired
+    public void setAddressMstRepository(AddressMstRepository addressMstRepository) {
+        this.addressMstRepository = addressMstRepository;
+    }
+
+    @Autowired
+    public void setJwtUtil(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Autowired
+    public void setFileStorageService(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 }

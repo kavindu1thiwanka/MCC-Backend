@@ -33,16 +33,13 @@ public class VehicleMst implements Serializable {
     private Integer seats;
 
     @Column(name = "gear_type", nullable = false)
-    private String gearType;
+    private Character gearType;
 
     @Column(name = "vehicle_image", nullable = false)
     private String vehicleImage;
 
-    @Column(name = "availability", nullable = false)
-    private Character availability;
-
     @Column(name = "price", nullable = false)
-    private BigDecimal priceForDay;
+    private BigDecimal pricePerDay;
 
     @Column(name = "status", nullable = false)
     private Character status;

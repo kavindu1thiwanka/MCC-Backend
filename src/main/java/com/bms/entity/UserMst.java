@@ -46,8 +46,19 @@ public class UserMst extends CommonBaseEntity implements Serializable {
     @Column(name = "driver_license_no")
     private String driverLicenseNo;
 
+    @Column(name = "driver_license_url")
+    private String driverLicenseUrl;
+
+    @Column(name = "is_online")
+    private Character isOnline;
+
+    @Column(name = "on_trip")
+    private Boolean onTrip;
+
     @Column(name = "status", nullable = false)
     private Character status;
+
+    private transient boolean isLoggedInProfileUpdated;
 
     public UserMst(UserDto user) {
         this.uuid = UUID.randomUUID().toString();
@@ -66,6 +77,13 @@ public class UserMst extends CommonBaseEntity implements Serializable {
             case IDENTIFIER_ROLE_DRIVER:
                 this.roleId = ROLE_ID_DRIVER;
                 break;
+            case IDENTIFIER_ROLE_ADMIN:
+                this.roleId = ROLE_ID_ADMIN;
+                break;
+        }
+
+        if (this.roleId == ROLE_ID_DRIVER) {
+            this.isOnline = STATUS_NO;
         }
     }
 

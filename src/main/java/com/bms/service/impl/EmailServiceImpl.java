@@ -4,6 +4,7 @@ import com.bms.entity.CommonEmailMst;
 import com.bms.repository.CommonEmailMstRepository;
 import com.bms.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.util.ByteArrayDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,42 @@ public class EmailServiceImpl implements EmailService {
 
         commonEmailMstRepository.saveAll(unsentEmailsList);
     }
+
+    @Override
+    public void sendEmailWithAttachment(Integer emailMstId, byte[] bytes) {
+        CommonEmailMst emailMst = commonEmailMstRepository.findById(emailMstId).orElse(null);
+
+        if (emailMst == null) {
+            LOGGER.error("Email with ID {} not found.", emailMstId);
+            return;
+        }
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(fromMail);
+            helper.setTo(emailMst.getSendTo());
+            helper.setSubject(emailMst.getSubject());
+            helper.setText(emailMst.getContent(), true);
+
+            // Attach the file
+            helper.addAttachment("Invoice.pdf", new ByteArrayDataSource(bytes, "application/pdf"));
+
+            mailSender.send(message);
+
+            emailMst.setStatus(STATUS_SENT);
+        } catch (Exception e) {
+            emailMst.setRetryCount(emailMst.getRetryCount() + 1);
+            emailMst.setStatus(maxRetryCount <= emailMst.getRetryCount() ? STATUS_FAILED : STATUS_UNSENT);
+            LOGGER.error("Error while sending email with attachment", e);
+        }
+
+        emailMst.setUpdateOn(new Date());
+        emailMst.setUpdateBy(SYSTEM_SCHEDULER);
+        commonEmailMstRepository.save(emailMst);
+    }
+
 
     @Autowired
     public void setMailSender(JavaMailSender mailSender) {

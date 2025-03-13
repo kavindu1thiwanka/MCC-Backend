@@ -39,6 +39,9 @@ public class ReservationMst extends CommonBaseEntity implements Serializable {
     @Column(name = "return_location", nullable = false)
     private String returnLocation;
 
+    @Column(name = "on_trip")
+    private Boolean onTrip;
+
     @Column(name = "payment_status", nullable = false)
     private Character paymentStatus;
 
@@ -47,13 +50,14 @@ public class ReservationMst extends CommonBaseEntity implements Serializable {
 
     public ReservationMst(ReservationDto reservationDto) {
         this.vehicleNo = reservationDto.getVehicleNo();
-        this.driverId = reservationDto.getNeedDriver() ? reservationDto.getDriverId() : null;
         this.pickUpDate = reservationDto.getPickUpDate();
         this.returnDate = reservationDto.getReturnDate();
         this.pickUpLocation = reservationDto.getPickUpLocation();
         this.returnLocation = reservationDto.getReturnLocation() == null || reservationDto.getReturnLocation().isEmpty()
                 ? reservationDto.getPickUpLocation() : reservationDto.getReturnLocation();
-        this.status = CommonConstants.STATUS_ACTIVE;
+        this.status = CommonConstants.STATUS_INACTIVE;
         this.paymentStatus = CommonConstants.STATUS_NOT_PAID;
+        this.driverId = 0;
+        this.onTrip = false;
     }
 }
