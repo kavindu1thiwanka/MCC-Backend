@@ -100,7 +100,7 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> addVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BusinessException, IOException {
 
-        validateVehicleDetails(vehicleMstDto);
+        validateVehicleDetails(vehicleMstDto, vehicleImage);
 
         VehicleMst vehicleMst = new VehicleMst();
         vehicleMst.setVehicleNo(vehicleMstDto.getVehicleNo());
@@ -125,10 +125,14 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    private void validateVehicleDetails(VehicleMstDto vehicleMstDto) throws BusinessException {
+    private void validateVehicleDetails(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BusinessException {
 
         if (vehicleMstDto == null) {
             throw new BusinessException(VEHICLE_DETAILS_CANNOT_BE_NULL);
+        }
+
+        if (vehicleImage == null) {
+            throw new BusinessException(VEHICLE_IMAGE_CANNOT_BE_NULL);
         }
 
         if (vehicleMstDto.getVehicleNo() == null || vehicleMstDto.getVehicleNo().isEmpty()) {
@@ -155,6 +159,10 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
 
         if (vehicleMstDto.getPricePerDay() == null) {
             throw new BusinessException(PRICE_PER_DAY_CANNOT_BE_NULL);
+        }
+
+        if (vehicleMstDto.getPricePerDay().equals(BigDecimal.ZERO)) {
+            throw new BusinessException(PRICE_PER_DAY_CANNOT_BE_ZERO);
         }
     }
 
@@ -191,6 +199,10 @@ public class VehicleManagementServiceImpl implements VehicleManagementService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> updateVehicle(VehicleMstDto vehicleMstDto, MultipartFile vehicleImage) throws BusinessException, IOException {
+
+        if (vehicleMstDto.getPricePerDay().equals(BigDecimal.ZERO)) {
+            throw new BusinessException(PRICE_PER_DAY_CANNOT_BE_ZERO);
+        }
 
         VehicleMst existingVehicle = getExistingVehicle(vehicleMstDto.getVehicleNo());
 

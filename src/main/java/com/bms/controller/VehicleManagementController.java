@@ -38,7 +38,7 @@ public class VehicleManagementController {
     @PostMapping(value = ADD_VEHICLE_V1, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Object> addVehicle(
             @RequestPart("vehicleMstDto") String vehicleMstDtoJson,
-            @RequestPart("vehicleImage") MultipartFile vehicleImage) throws BusinessException, IOException {
+            @RequestPart(value = "vehicleImage", required = false)  MultipartFile vehicleImage) throws BusinessException, IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
         VehicleMstDto vehicleMstDto = objectMapper.readValue(vehicleMstDtoJson, VehicleMstDto.class);
@@ -47,8 +47,13 @@ public class VehicleManagementController {
     }
 
 
-    @PutMapping(UPDATE_VEHICLE_V1)
-    public ResponseEntity<Object> updateVehicle(@RequestBody VehicleMstDto vehicleMstDto, @ModelAttribute MultipartFile vehicleImage) throws BusinessException, IOException {
+    @PutMapping(value = UPDATE_VEHICLE_V1, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Object> updateVehicle(@RequestPart("vehicleMstDto") String vehicleMstDtoJson,
+                                                @RequestPart(value = "vehicleImage", required = false)  MultipartFile vehicleImage) throws BusinessException, IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        VehicleMstDto vehicleMstDto = objectMapper.readValue(vehicleMstDtoJson, VehicleMstDto.class);
+
         return vehicleManagementService.updateVehicle(vehicleMstDto, vehicleImage);
     }
 
