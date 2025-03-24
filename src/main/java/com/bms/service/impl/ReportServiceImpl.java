@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -56,12 +57,159 @@ public class ReportServiceImpl implements ReportService {
                 return generateReservationReport(reportData);
             case "revenue":
                 return generateRevenueReport(reportData);
-            case "customer":
-                return new ResponseEntity<>("Customer Report", HttpStatus.OK);
-            case "vehicleUtilization":
-                return new ResponseEntity<>("Vehicle Utilization Report", HttpStatus.OK);
+            case "driver":
+                return generateDriverReport(reportData);
             default:
                 return new ResponseEntity<>("Invalid Report Type", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private ResponseEntity<Object> generateDriverReport(ReportDto reportData) {
+
+        List<ReservationDto> driversResDetails = new ArrayList<>();
+        UserMst driver = (UserMst) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (reportData.getStartDate() == null || reportData.getEndDate() == null) {
+            driversResDetails = reservationMstRepository.findByDriverId(driver.getId());
+        } else {
+            driversResDetails =  reservationMstRepository.findByDriverIdAndDateBetween(driver.getId(),
+                    reportData.getStartDate(), reportData.getEndDate());
+        }
+
+
+        if (driversResDetails.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        if (reportData.getFileFormat().equals("pdf")) {
+            reportData.setFileContent(generateDriverReportPdf(driversResDetails, reportData));
+        } else {
+            reportData.setFileContent(generateDriverReportExcel(driversResDetails));
+        }
+
+        reportData.setFileName("Driver Earning Report." + reportData.getFileFormat());
+
+        return new ResponseEntity<>(reportData, HttpStatus.OK);
+    }
+
+    private byte[] generateDriverReportExcel(List<ReservationDto> driversResDetails) {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Earnings");
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Pickup Location");
+            headerRow.createCell(2).setCellValue("Drop-off Location");
+            headerRow.createCell(3).setCellValue("Pickup Date");
+            headerRow.createCell(4).setCellValue("Drop-off Date");
+            int rowIdx = 1;
+            BigDecimal totalAmount = new BigDecimal(0);
+            for (ReservationDto res : driversResDetails) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue("#" + res.getId());
+                row.createCell(1).setCellValue(res.getPickUpLocation());
+                row.createCell(2).setCellValue(res.getReturnLocation());
+                row.createCell(3).setCellValue(res.getPickUpDate().toString());
+                row.createCell(4).setCellValue(res.getReturnDate().toString());
+
+                totalAmount = totalAmount.add(BigDecimal.valueOf(1200));
+            }
+
+            Row row = sheet.createRow(rowIdx);
+            row.createCell(0).setCellValue("Total Earnings");
+            row.createCell(1).setCellValue(String.valueOf(totalAmount));
+
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error generating earning report Excel", e);
+        }
+    }
+
+    private byte[] generateDriverReportPdf(List<ReservationDto> driversResDetails, ReportDto reportData) {
+        try (PDDocument document = new PDDocument();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            PDPage page = new PDPage(new PDRectangle(PDRectangle.A3.getHeight(), PDRectangle.A3.getWidth()));
+            document.addPage(page);
+
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 16);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(500, 750);
+            contentStream.showText("Earning Report");
+            contentStream.endText();
+
+            addMetadata(contentStream, reportData.getStartDate(), reportData.getEndDate(), 700, 750);
+
+            float margin = 50;
+            float yStart = 680 - margin;
+            float tableWidth = page.getMediaBox().getWidth() - 2 * margin;
+            float yPosition = yStart;
+            float rowHeight = 20;
+
+            // Adjust column widths for landscape mode
+            float[] columnWidths = {100, 200, 200, 200, 200};
+            String[] headers = {"ID", "Pickup Location", "Drop-off Location", "Pickup Date", "Drop-off Date"};
+
+            // Draw table header
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+            yPosition -= rowHeight;
+            drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, headers);
+
+            // Draw table rows
+            BigDecimal totalAmount = new BigDecimal(0);
+            contentStream.setFont(PDType1Font.HELVETICA, 8);
+            for (ReservationDto res : driversResDetails) {
+                if (yPosition < 50) {
+                    contentStream.close();
+                    page = new PDPage(PDRectangle.A4);
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    yPosition = yStart - rowHeight;
+                    contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+                    drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, headers);
+                    contentStream.setFont(PDType1Font.HELVETICA, 8);
+                }
+
+                yPosition -= rowHeight;
+                String[] rowData = {
+                        "#" + res.getId(),
+                        res.getPickUpLocation(),
+                        res.getReturnLocation(),
+                        res.getPickUpDate().toString(),
+                        res.getReturnDate().toString()
+                };
+
+                totalAmount = totalAmount.add(BigDecimal.valueOf(1200));
+
+                drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, rowData);
+            }
+
+            if (yPosition < 50) {
+                contentStream.close();
+                page = new PDPage(PDRectangle.A4);
+                document.addPage(page);
+                contentStream = new PDPageContentStream(document, page);
+                yPosition = yStart - rowHeight;
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+                drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, headers);
+                contentStream.setFont(PDType1Font.HELVETICA, 8);
+            }
+
+            yPosition -= rowHeight;
+            String[] rowData = {
+                    "Total Earnings",
+                    String.valueOf(totalAmount)
+            };
+            drawTableRow(contentStream, yPosition, margin, tableWidth, columnWidths, rowData);
+
+            contentStream.close();
+            document.save(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error generating earning report PDF", e);
         }
     }
 
