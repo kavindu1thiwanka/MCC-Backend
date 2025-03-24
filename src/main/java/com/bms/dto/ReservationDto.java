@@ -48,6 +48,22 @@ public class ReservationDto {
         this.status = mst.getStatus();
     }
 
+    public ReservationDto(ReservationMst mst, BigDecimal amount) {
+        this.id = mst.getId();
+        this.vehicleNo = mst.getVehicleNo();
+        this.pickUpDate = mst.getPickUpDate();
+        this.returnDate = mst.getReturnDate();
+        this.pickUpLocation = mst.getPickUpLocation();
+        this.returnLocation = mst.getReturnLocation();
+        this.userId = mst.getUserId();
+        this.needDriver = mst.getDriverId() != null && mst.getDriverId() != 0;
+        this.driverId = mst.getDriverId();
+        this.onTrip = mst.getOnTrip();
+        this.paymentStatus = mst.getPaymentStatus();
+        this.status = mst.getStatus();
+        this.totalCost = amount;
+    }
+
     public ReservationDto(ReservationMst mst, UserMst customer, VehicleMst vehicle, BigDecimal amount) {
         this.id = mst.getId();
         this.vehicleNo = vehicle.getVehicleNo();
