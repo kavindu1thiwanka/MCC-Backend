@@ -156,20 +156,20 @@ class VehicleManagementServiceImplTest {
     void addVehicle_ValidationFailures() {
         // Test null vehicle details
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> vehicleService.addVehicle(null, null));
+            () -> vehicleService.addVehicle(null, new MockMultipartFile("ABC", "ABC.jpg", "", "".getBytes())));
         assertEquals(VEHICLE_DETAILS_CANNOT_BE_NULL, exception.getMessage());
 
         // Test empty vehicle number
         testVehicleDto.setVehicleNo("");
         exception = assertThrows(BusinessException.class,
-            () -> vehicleService.addVehicle(testVehicleDto, null));
+            () -> vehicleService.addVehicle(testVehicleDto, new MockMultipartFile("ABC", "ABC.jpg", "", "".getBytes())));
         assertEquals(VEHICLE_NO_CANNOT_BE_EMPTY, exception.getMessage());
 
         // Test duplicate vehicle
         testVehicleDto.setVehicleNo("ABC123");
         when(vehicleMstRepository.existsByVehicleNo(anyString())).thenReturn(true);
         exception = assertThrows(BusinessException.class,
-            () -> vehicleService.addVehicle(testVehicleDto, null));
+            () -> vehicleService.addVehicle(testVehicleDto, new MockMultipartFile("ABC", "ABC.jpg", "", "".getBytes())));
         assertEquals(VEHICLE_ALREADY_EXISTS, exception.getMessage());
 
         verify(vehicleMstRepository, never()).save(any());
