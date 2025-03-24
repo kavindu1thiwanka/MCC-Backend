@@ -72,7 +72,8 @@ class AuthServiceImplTest {
         MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(authService, "pwdResetUrl", PWD_RESET_URL_VALUE);
         // Set up default security context
-        Authentication auth = new UsernamePasswordAuthenticationToken("system", null);
+        UserMst user = createTestUser();
+        Authentication auth = new UsernamePasswordAuthenticationToken(user, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
@@ -183,7 +184,7 @@ class AuthServiceImplTest {
         verify(commonEmailMstRepository).save(argThat(email -> {
             assertEquals(TEST_EMAIL, email.getSendTo());
             assertNotNull(email.getCreatedBy());
-            assertEquals("system", email.getCreatedBy());
+            assertEquals(user.getUsername(), email.getCreatedBy());
             return true;
         }));
     }
